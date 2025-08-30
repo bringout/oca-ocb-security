@@ -2,5 +2,5 @@
 
 This addon depends on:
 
-- [microsoft_account](https://github.com/bringout/oca-ocb-accounting/tree/eb4335e9848ccce1d07fb3692af80937feeb0e3c/odoo-bringout-oca-ocb-microsoft_account)
-- [calendar](https://github.com/bringout/oca-ocb-technical/tree/88371c78cad15e33295a8d1fee0e733653eb4213/odoo-bringout-oca-ocb-calendar)
+- [microsoft_account](https://github.com/bringout/oca-ocb-accounting/tree/d63411e729b42117587a2f63f6ff389d6dbac8c2/odoo-bringout-oca-ocb-microsoft_account)
+- [calendar](https://github.com/bringout/oca-ocb-technical/tree/c402a40a06d0be2fb22b984c2e7c0bd673fa7f80/odoo-bringout-oca-ocb-calendar)
