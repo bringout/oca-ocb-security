@@ -2,5 +2,5 @@
 
 This addon depends on:
 
-- [google_account](../../../../../oca-ocb-accounting/odoo-bringout-oca-ocb-google_account)
-- [calendar](../../../../../oca-ocb-technical/odoo-bringout-oca-ocb-calendar)
+- [google_account](https://github.com/bringout/oca-ocb-accounting)
+- [calendar](https://github.com/bringout/oca-ocb-technical)

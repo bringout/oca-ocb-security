@@ -2,5 +2,5 @@
 
 This addon depends on:
 
-- [portal](../../../../../oca-ocb-website/odoo-bringout-oca-ocb-portal)
-- [auth_totp](../../../../odoo-bringout-oca-ocb-auth_totp)
+- [portal](https://github.com/bringout/oca-ocb-website)
+- [auth_totp](https://github.com/bringout/oca-ocb-security)

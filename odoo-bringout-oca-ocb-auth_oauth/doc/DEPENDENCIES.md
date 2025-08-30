@@ -3,6 +3,6 @@
 This addon depends on:
 
 - base
-- [web](../../../../../oca-ocb-core/odoo-bringout-oca-ocb-web)
-- [base_setup](../../../../../oca-ocb-core/odoo-bringout-oca-ocb-base_setup)
-- [auth_signup](../../../../odoo-bringout-oca-ocb-auth_signup)
+- [web](https://github.com/bringout/oca-ocb-core)
+- [base_setup](https://github.com/bringout/oca-ocb-core)
+- [auth_signup](https://github.com/bringout/oca-ocb-security)

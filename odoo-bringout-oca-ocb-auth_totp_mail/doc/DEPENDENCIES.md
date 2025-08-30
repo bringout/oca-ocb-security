@@ -2,5 +2,5 @@
 
 This addon depends on:
 
-- [auth_totp](../../../../odoo-bringout-oca-ocb-auth_totp)
-- [mail](../../../../../oca-ocb-core/odoo-bringout-oca-ocb-mail)
+- [auth_totp](https://github.com/bringout/oca-ocb-security)
+- [mail](https://github.com/bringout/oca-ocb-core)
