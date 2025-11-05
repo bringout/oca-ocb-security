@@ -17,17 +17,20 @@ msgstr ""
 
 #. module: auth_password_policy_signup
 #. odoo-javascript
-#: code:addons/auth_password_policy_signup/static/src/js/password_meter.js:0
+#: code:addons/auth_password_policy_signup/static/src/js/password_meter.js
 #, python-format
 msgid ""
 "Required: %s.\n"
 "\n"
 "Hint: increase length, use multiple words and use non-letter characters to increase your password's strength."
 msgstr ""
+"Obavezno: %s.\n"
+"\n"
+"Savjet: povećajte dužinu, koristite više riječi i koristite ne-slovne znakove kako biste povećali snagu vaše lozinke."
 
 #. module: auth_password_policy_signup
 #. odoo-javascript
-#: code:addons/auth_password_policy_signup/static/src/js/password_meter.js:0
+#: code:addons/auth_password_policy_signup/static/src/js/password_meter.js
 #, python-format
 msgid "no requirements"
 msgstr "nema zahtjeva"

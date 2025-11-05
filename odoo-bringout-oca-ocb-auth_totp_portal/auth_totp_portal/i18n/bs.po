@@ -17,7 +17,7 @@ msgstr ""
 
 #. module: auth_totp_portal
 #. odoo-javascript
-#: code:addons/auth_totp_portal/static/src/js/totp_frontend.js:0
+#: code:addons/auth_totp_portal/static/src/js/totp_frontend.js
 #, python-format
 msgid " Copy"
 msgstr " Kopiraj"
@@ -33,11 +33,13 @@ msgid ""
 "<i class=\"fa fa-warning\"/>\n"
 "                        Two-factor authentication not enabled"
 msgstr ""
+"<i class=\"fa fa-warning\"/>\n"
+"                        Dvofaktorska autentifikacija nije omogućena"
 
 #. module: auth_totp_portal
 #: model_terms:ir.ui.view,arch_db:auth_totp_portal.totp_portal_hook
 msgid "<i title=\"Documentation\" class=\"fa fa-fw o_button_icon fa-info-circle\"/>"
-msgstr "<i title=\"Documentation\" class=\"fa fa-fw o_button_icon fa-info-circle\"/>"
+msgstr "<i title=\"Dokumentacija\" class=\"fa fa-fw o_button_icon fa-info-circle\"/>"
 
 #. module: auth_totp_portal
 #: model_terms:ir.ui.view,arch_db:auth_totp_portal.totp_portal_hook
@@ -47,6 +49,10 @@ msgid ""
 "                        Two-factor authentication enabled\n"
 "                    </span>"
 msgstr ""
+"<span class=\"text-success\">\n"
+"                        <i class=\"fa fa-check-circle\"/>\n"
+"                        Dvofaktorska autentifikacija omogućena\n"
+"                    </span>"
 
 #. module: auth_totp_portal
 #: model_terms:ir.ui.view,arch_db:auth_totp_portal.totp_portal_hook
@@ -58,9 +64,10 @@ msgstr "<strong>Dodano</strong>"
 msgid "<strong>Trusted Device</strong>"
 msgstr "<strong>Pouzdani uređaj</strong>"
 
+# taken from hr.po
 #. module: auth_totp_portal
 #. odoo-javascript
-#: code:addons/auth_totp_portal/static/src/js/totp_frontend.js:0
+#: code:addons/auth_totp_portal/static/src/js/totp_frontend.js
 #, python-format
 msgid "Copied !"
 msgstr "Kopirano !"
@@ -72,7 +79,7 @@ msgstr "Omogući dvostruku autentifikaciju"
 
 #. module: auth_totp_portal
 #. odoo-javascript
-#: code:addons/auth_totp_portal/static/src/js/totp_frontend.js:0
+#: code:addons/auth_totp_portal/static/src/js/totp_frontend.js
 #, python-format
 msgid "Operation failed for unknown reason."
 msgstr "Operacija neuspješna iz nepoznatog razloga."
@@ -82,11 +89,13 @@ msgstr "Operacija neuspješna iz nepoznatog razloga."
 msgid "Revoke All"
 msgstr "Opozovi sve"
 
+# taken from hr.po
 #. module: auth_totp_portal
 #: model_terms:ir.ui.view,arch_db:auth_totp_portal.totp_portal_hook
 msgid "Two-factor authentication"
 msgstr "Dvofaktorska autentifikacija"
 
+# taken from hr.po
 #. module: auth_totp_portal
 #: model:ir.model,name:auth_totp_portal.model_res_users
 msgid "User"

@@ -15,75 +15,91 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
 
+# taken from hr.po
 #. module: auth_password_policy
 #: model:ir.model,name:auth_password_policy.model_res_config_settings
 msgid "Config Settings"
 msgstr "Postavke"
 
+# taken from hr.po
 #. module: auth_password_policy
 #: model:ir.model.fields,field_description:auth_password_policy.field_res_config_settings__minlength
 msgid "Minimum Password Length"
 msgstr "Minimalna duljina lozinke"
 
+# taken from hr.po
 #. module: auth_password_policy
 #: model:ir.model.fields,help:auth_password_policy.field_res_config_settings__minlength
 msgid ""
 "Minimum number of characters passwords must contain, set to 0 to disable."
 msgstr ""
+"Minimalni broj znakova koje lozinka mora sadržavati, postavite na 0 da "
+"onemogućite provjeru."
 
+# taken from hr.po
 #. module: auth_password_policy
 #. odoo-javascript
-#: code:addons/auth_password_policy/static/src/password_field.js:0
+#: code:addons/auth_password_policy/static/src/password_field.js
 #, python-format
 msgid "Password"
 msgstr "Zaporka"
 
+# taken from hr.po
 #. module: auth_password_policy
 #. odoo-python
-#: code:addons/auth_password_policy/models/res_users.py:0
+#: code:addons/auth_password_policy/models/res_users.py
 #, python-format
 msgid "Passwords must have at least %d characters, got %d."
 msgstr "Lozinke moraju imati najmanje %d znakova, postavljeno %d."
 
+# taken from hr.po
 #. module: auth_password_policy
 #. odoo-javascript
-#: code:addons/auth_password_policy/static/src/password_meter.js:0
+#: code:addons/auth_password_policy/static/src/password_meter.js
 #, python-format
 msgid ""
 "Required: %s\n"
 "\n"
 "Hint: to increase password strength, increase length, use multiple words, and use non-letter characters."
 msgstr ""
+"Obavezno: %s\n"
+"\n"
+"Sugestija: za poboljčavanje snage lozinke, povećajte duljinu, koristite više riječi i/ili specijalne znakove."
 
+# taken from hr.po
 #. module: auth_password_policy
 #: model:ir.model,name:auth_password_policy.model_res_users
 msgid "User"
 msgstr "Korisnik"
 
+# taken from hr.po
 #. module: auth_password_policy
 #. odoo-javascript
-#: code:addons/auth_password_policy/static/src/password_policy.js:0
+#: code:addons/auth_password_policy/static/src/password_policy.js
 #, python-format
 msgid "at least %s character classes"
 msgstr "najmanje %s grupa znakova"
 
+# taken from hr.po
 #. module: auth_password_policy
 #. odoo-javascript
-#: code:addons/auth_password_policy/static/src/password_policy.js:0
+#: code:addons/auth_password_policy/static/src/password_policy.js
 #, python-format
 msgid "at least %s characters"
 msgstr "najmanje %s znakova"
 
+# taken from hr.po
 #. module: auth_password_policy
 #. odoo-javascript
-#: code:addons/auth_password_policy/static/src/password_policy.js:0
+#: code:addons/auth_password_policy/static/src/password_policy.js
 #, python-format
 msgid "at least %s words"
 msgstr "najmanje %s riječi"
 
+# taken from hr.po
 #. module: auth_password_policy
 #. odoo-javascript
-#: code:addons/auth_password_policy/static/src/password_meter.js:0
+#: code:addons/auth_password_policy/static/src/password_meter.js
 #, python-format
 msgid "no requirements"
 msgstr "nema zahtjeva"

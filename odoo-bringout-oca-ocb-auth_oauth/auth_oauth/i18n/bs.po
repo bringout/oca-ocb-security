@@ -15,33 +15,39 @@ msgstr ""
 "Content-Transfer-Encoding: \n"
 "Plural-Forms: \n"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model_terms:ir.ui.view,arch_db:auth_oauth.providers
 msgid "- or -"
 msgstr "— ili —"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model_terms:ir.ui.view,arch_db:auth_oauth.res_config_settings_view_form
 msgid "<i class=\"fa fa-fw fa-arrow-right\"/>Tutorial"
 msgstr "<i class=\"fa fa-fw fa-arrow-right\"/>Upute"
 
+# taken from hr.po
 #. module: auth_oauth
 #. odoo-python
-#: code:addons/auth_oauth/controllers/main.py:0
+#: code:addons/auth_oauth/controllers/main.py
 #, python-format
 msgid "Access Denied"
 msgstr "Pristup Odbijen"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_res_config_settings__auth_oauth_google_enabled
 msgid "Allow users to sign in with Google"
 msgstr "Dozvoli prijavu sa Google računom"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model_terms:ir.ui.view,arch_db:auth_oauth.res_config_settings_view_form
 msgid "Allow users to sign in with their Google account"
 msgstr "Dozvoli prijavu sa Google računom"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__enabled
 msgid "Allowed"
@@ -50,34 +56,39 @@ msgstr "Dopušteno"
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__auth_endpoint
 msgid "Authorization URL"
-msgstr "Authorization URL"
+msgstr "URL autorizacije"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__css_class
 msgid "CSS class"
 msgstr "CSS klasa"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__client_id
-#: model:ir.model.fields,field_description:auth_oauth.field_res_config_settings__auth_oauth_google_client_id
 msgid "Client ID"
 msgstr "ID Klijenta"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model_terms:ir.ui.view,arch_db:auth_oauth.res_config_settings_view_form
 msgid "Client ID:"
 msgstr "ID klijenta:"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model,name:auth_oauth.model_res_config_settings
 msgid "Config Settings"
 msgstr "Postavke"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__create_uid
 msgid "Created by"
 msgstr "Kreirao"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__create_date
 msgid "Created on"
@@ -86,18 +97,21 @@ msgstr "Kreirano"
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__data_endpoint
 msgid "Data Endpoint"
-msgstr "Data Endpoint"
+msgstr "Krajnja tačka za podatke"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__display_name
 msgid "Display Name"
 msgstr "Prikazani naziv"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model_terms:ir.ui.view,arch_db:auth_oauth.res_config_settings_view_form
 msgid "Documentation"
 msgstr "Dokumentacija"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model_terms:ir.ui.view,arch_db:auth_oauth.res_config_settings_view_form
 msgid "Google Authentication"
@@ -108,72 +122,85 @@ msgstr "Google Authentikacija"
 msgid "ID"
 msgstr "ID"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider____last_update
 msgid "Last Modified on"
 msgstr "Zadnje mijenjano"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__write_uid
 msgid "Last Updated by"
 msgstr "Zadnji ažurirao"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__write_date
 msgid "Last Updated on"
 msgstr "Zadnje ažurirano"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.fields,help:auth_oauth.field_auth_oauth_provider__body
 msgid "Link text in Login Dialog"
 msgstr "tekst linka u dijalogu prijave"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:auth.oauth.provider,body:auth_oauth.provider_facebook
 msgid "Log in with Facebook"
 msgstr "Prijava preko Facebooka"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:auth.oauth.provider,body:auth_oauth.provider_google
 msgid "Log in with Google"
 msgstr "Prijava preko Google"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:auth.oauth.provider,body:auth_oauth.provider_openerp
 msgid "Log in with Odoo.com"
 msgstr "Prijava preko Odoo.com"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__body
 msgid "Login button label"
 msgstr "Natpis na gumbu za prijavu"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_res_users__oauth_access_token
 msgid "OAuth Access Token"
 msgstr "Token OAuth pristupa"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_res_users__oauth_provider_id
 msgid "OAuth Provider"
 msgstr "Pružatelj OAuth"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.ui.menu,name:auth_oauth.menu_oauth_providers
-#: model_terms:ir.ui.view,arch_db:auth_oauth.res_config_settings_view_form
 msgid "OAuth Providers"
 msgstr "Pružatelji OAuth"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.constraint,message:auth_oauth.constraint_res_users_uniq_users_oauth_provider_oauth_uid
 msgid "OAuth UID must be unique per provider"
 msgstr "OAuth UID mora biti jedinstven po pružatelju"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_res_users__oauth_uid
 msgid "OAuth User ID"
 msgstr "OAuth Korisnički ID"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model,name:auth_oauth.model_auth_oauth_provider
 msgid "OAuth2 provider"
@@ -184,48 +211,57 @@ msgstr "OAuth2 pružatelj"
 msgid "Oauth"
 msgstr "Oauth"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.fields,help:auth_oauth.field_res_users__oauth_uid
 msgid "Oauth Provider user_id"
 msgstr "user_id OAuth pružatelja usluge"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__name
 msgid "Provider name"
 msgstr "Naziv pružatelja usluge"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.actions.act_window,name:auth_oauth.action_oauth_provider
 msgid "Providers"
 msgstr "Pružatelji"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__scope
 msgid "Scope"
 msgstr "Opseg"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__sequence
 msgid "Sequence"
 msgstr "Sekvenca"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_res_config_settings__server_uri_google
 msgid "Server uri"
 msgstr "ULI Poslužitelja"
 
+# taken from hr.po
 #. module: auth_oauth
 #. odoo-python
-#: code:addons/auth_oauth/controllers/main.py:0
+#: code:addons/auth_oauth/controllers/main.py
 #, python-format
 msgid "Sign up is not allowed on this database."
 msgstr "Prijava nije dozvoljena na ovoj bazi."
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model,name:auth_oauth.model_ir_config_parameter
 msgid "System Parameter"
 msgstr "Sistemski parametar"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model:ir.model,name:auth_oauth.model_res_users
 msgid "User"
@@ -234,24 +270,28 @@ msgstr "Korisnik"
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__validation_endpoint
 msgid "UserInfo URL"
-msgstr "UserInfo URL"
+msgstr "URL korisničkih informacija"
 
+# taken from hr.po
 #. module: auth_oauth
 #. odoo-python
-#: code:addons/auth_oauth/controllers/main.py:0
+#: code:addons/auth_oauth/controllers/main.py
 #, python-format
 msgid ""
 "You do not have access to this database or your invitation has expired. "
 "Please ask for an invitation and be sure to follow the link in your "
 "invitation email."
 msgstr ""
+"Nemate pristup ovoj bazi ili je Vaša pozivnica istekla. Molimo zatražite "
+"pozivnicu i kliknite na link u e-mailu prije nego istekne."
 
+# taken from hr.po
 #. module: auth_oauth
 #: model_terms:ir.ui.view,arch_db:auth_oauth.view_oauth_provider_form
-#: model_terms:ir.ui.view,arch_db:auth_oauth.view_oauth_provider_tree
 msgid "arch"
 msgstr "arhitektura"
 
+# taken from hr.po
 #. module: auth_oauth
 #: model_terms:ir.ui.view,arch_db:auth_oauth.res_config_settings_view_form
 msgid "e.g. 1234-xyz.apps.googleusercontent.com"

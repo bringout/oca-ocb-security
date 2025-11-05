@@ -31,44 +31,66 @@ msgid ""
 "        (|(mail=%s)(uid=%s))\n"
 "    "
 msgstr ""
+"    Filter koji se koristi za pretraživanje korisničkih računa u LDAP bazi podataka. Predstavlja proizvoljan LDAP filter u tekstualnom formatu. Svaki `%s` rezervirano mjesto će biti zamijenjeno prijavnim imenom (identifikatorom) koje je korisnik unio, filter treba sadržavati najmanje jedno takvo rezervirano mjesto.\n"
+"\n"
+"    Filter mora rezultirati tačno jednim (1) rezultatom, inače će prijava biti smatrana neispravnom.\n"
+"\n"
+"    Primjer (stvarni atributi ovise o LDAP serveru i postavkama):\n"
+"\n"
+"        (&(objectCategory=person)(objectClass=user)(sAMAccountName=%s))\n"
+"\n"
+"    ili\n"
+"\n"
+"        (|(mail=%s)(uid=%s))\n"
+"    "
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model.fields,help:auth_ldap.field_res_company_ldap__create_user
 msgid ""
 "Automatically create local user accounts for new users authenticating via "
 "LDAP"
 msgstr ""
+"Automatski kreiraj nove korisničke račune za korisnike koji se autoriziraju "
+"putem LDAP-a"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model,name:auth_ldap.model_res_company
 msgid "Companies"
 msgstr "Kompanije"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__company
 msgid "Company"
 msgstr "Kompanija"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model,name:auth_ldap.model_res_company_ldap
 msgid "Company LDAP configuration"
 msgstr "LDAP postavke tvrtke"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model,name:auth_ldap.model_res_config_settings
 msgid "Config Settings"
 msgstr "Postavke"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__create_user
 msgid "Create User"
 msgstr "Kreiraj korisnika"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__create_uid
 msgid "Created by"
 msgstr "Kreirao"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__create_date
 msgid "Created on"
@@ -80,7 +102,10 @@ msgid ""
 "DN of the user search scope: all descendants of this base will be searched "
 "for users."
 msgstr ""
+"DN opsega pretrage korisnika: svi potomci ove baze će biti pretraženi za "
+"korisnike."
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__display_name
 msgid "Display Name"
@@ -91,28 +116,31 @@ msgstr "Prikazani naziv"
 msgid "ID"
 msgstr "ID"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model_terms:ir.ui.view,arch_db:auth_ldap.res_company_ldap_view_tree
-#: model_terms:ir.ui.view,arch_db:auth_ldap.view_ldap_installer_form
 msgid "LDAP Configuration"
 msgstr "LDAP konfiguracija"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model.fields,field_description:auth_ldap.field_res_company__ldaps
-#: model:ir.model.fields,field_description:auth_ldap.field_res_config_settings__ldaps
 msgid "LDAP Parameters"
 msgstr "LDAP Parametri"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model_terms:ir.ui.view,arch_db:auth_ldap.res_config_settings_view_form
 msgid "LDAP Server"
 msgstr "LDAP poslužitelj"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__ldap_server
 msgid "LDAP Server address"
 msgstr "Adresa LDAP servera"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__ldap_server_port
 msgid "LDAP Server port"
@@ -121,50 +149,60 @@ msgstr "Port LDAP servera"
 #. module: auth_ldap
 #: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__ldap_base
 msgid "LDAP base"
-msgstr "LDAP base"
+msgstr "LDAP baza"
 
 #. module: auth_ldap
 #: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__ldap_binddn
 msgid "LDAP binddn"
 msgstr "LDAP binddn"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__ldap_filter
 msgid "LDAP filter"
 msgstr "LDAP filtar"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__ldap_password
 msgid "LDAP password"
 msgstr "LDAP lozinka"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap____last_update
 msgid "Last Modified on"
 msgstr "Zadnje mijenjano"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__write_uid
 msgid "Last Updated by"
 msgstr "Zadnji ažurirao"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__write_date
 msgid "Last Updated on"
 msgstr "Zadnje ažurirano"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model_terms:ir.ui.view,arch_db:auth_ldap.view_ldap_installer_form
 msgid "Login Information"
 msgstr "Podaci o prijavi"
 
+# taken from hr.po
 #. module: auth_ldap
 #. odoo-python
-#: code:addons/auth_ldap/models/res_company_ldap.py:0
+#: code:addons/auth_ldap/models/res_company_ldap.py
 #, python-format
 msgid "No local user found for LDAP login and not configured to create one"
-msgstr "Nije pronađen lokalni korisnik za LDAP prijavu i nije podešeno kreiranje novog"
+msgstr ""
+"Nije pronađen lokalni korisnik za LDAP prijavu i nije podešeno kreiranje "
+"novog"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model_terms:ir.ui.view,arch_db:auth_ldap.view_ldap_installer_form
 msgid "Process Parameter"
@@ -177,33 +215,43 @@ msgid ""
 "option requires a server with STARTTLS enabled, otherwise all authentication"
 " attempts will fail."
 msgstr ""
+"Zahtijeva sigurnu TLS/SSL enkripciju prilikom povezivanja na LDAP server. "
+"Ova opcija zahtijeva server sa omogućenim STARTTLS-om, inače će svi pokušaji"
+" autentifikacije propasti."
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__sequence
 msgid "Sequence"
 msgstr "Sekvenca"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model_terms:ir.ui.view,arch_db:auth_ldap.view_ldap_installer_form
 msgid "Server Information"
 msgstr "Informacije o poslužitelju"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.actions.act_window,name:auth_ldap.action_ldap_installer
 msgid "Setup your LDAP Server"
 msgstr "Postavite LDAP poslužitelj"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__user
 msgid "Template User"
 msgstr "Predložak korisnika"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model.fields,help:auth_ldap.field_res_company_ldap__ldap_password
 msgid ""
 "The password of the user account on the LDAP server that is used to query "
 "the directory."
 msgstr ""
+"Lozinka korisničkog računa na LDAP poslužitelju koja se koristi za upite "
+"prema poslužitelju."
 
 #. module: auth_ldap
 #: model:ir.model.fields,help:auth_ldap.field_res_company_ldap__ldap_binddn
@@ -211,22 +259,28 @@ msgid ""
 "The user account on the LDAP server that is used to query the directory. "
 "Leave empty to connect anonymously."
 msgstr ""
+"Korisnički račun na LDAP serveru koji se koristi za pretraživanje "
+"direktorija. Ostavite prazno za anonimno povezivanje."
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__ldap_tls
 msgid "Use TLS"
 msgstr "Koristi TLS"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model,name:auth_ldap.model_res_users
 msgid "User"
 msgstr "Korisnik"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model_terms:ir.ui.view,arch_db:auth_ldap.view_ldap_installer_form
 msgid "User Information"
 msgstr "Korisničke informacije"
 
+# taken from hr.po
 #. module: auth_ldap
 #: model:ir.model.fields,help:auth_ldap.field_res_company_ldap__user
 msgid "User to copy when creating new users"

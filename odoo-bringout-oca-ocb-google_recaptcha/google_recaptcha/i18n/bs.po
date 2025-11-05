@@ -26,12 +26,16 @@ msgid ""
 "By default, should be one of 0.1, 0.3, 0.7, 0.9.\n"
 "1.0 is very likely a good interaction, 0.0 is very likely a bot"
 msgstr ""
+"Po zadanome, treba biti jedan od 0.1, 0.3, 0.7, 0.9.\n"
+"1.0 je vrlo vjerojatno dobra interakcija, 0.0 je vrlo vjerojatno bot"
 
+# taken from hr.po
 #. module: google_recaptcha
 #: model:ir.model,name:google_recaptcha.model_res_config_settings
 msgid "Config Settings"
 msgstr "Postavke"
 
+# taken from hr.po
 #. module: google_recaptcha
 #: model:ir.model,name:google_recaptcha.model_ir_http
 msgid "HTTP Routing"
@@ -42,6 +46,7 @@ msgstr "HTTP usmjeravanje"
 msgid "If no keys are provided, no checks will be done."
 msgstr "Ako nisu dati ključevi, neće se raditi provjere."
 
+# taken from hr.po
 #. module: google_recaptcha
 #: model:ir.model.fields,field_description:google_recaptcha.field_res_config_settings__recaptcha_min_score
 msgid "Minimum score"
@@ -49,21 +54,21 @@ msgstr "Minimalni rezultat"
 
 #. module: google_recaptcha
 #. odoo-javascript
-#: code:addons/google_recaptcha/static/src/js/recaptcha.js:0
+#: code:addons/google_recaptcha/static/src/js/recaptcha.js
 #, python-format
 msgid "No recaptcha site key set."
 msgstr "Nije postavljen ključ recaptcha stranice."
 
 #. module: google_recaptcha
 #. odoo-javascript
-#: code:addons/google_recaptcha/static/src/xml/recaptcha.xml:0
+#: code:addons/google_recaptcha/static/src/xml/recaptcha.xml
 #, python-format
 msgid "Privacy Policy"
 msgstr "Pravila privatnosti"
 
 #. module: google_recaptcha
 #. odoo-javascript
-#: code:addons/google_recaptcha/static/src/xml/recaptcha.xml:0
+#: code:addons/google_recaptcha/static/src/xml/recaptcha.xml
 #, python-format
 msgid "Protected by reCAPTCHA,"
 msgstr "Zaštićeno reCAPTCHA-om,"
@@ -80,49 +85,49 @@ msgstr "Ključ stranice"
 
 #. module: google_recaptcha
 #. odoo-javascript
-#: code:addons/google_recaptcha/static/src/xml/recaptcha.xml:0
+#: code:addons/google_recaptcha/static/src/xml/recaptcha.xml
 #, python-format
 msgid "Terms of Service"
 msgstr "Uvjeti korištenja"
 
 #. module: google_recaptcha
 #. odoo-python
-#: code:addons/google_recaptcha/models/ir_http.py:0
+#: code:addons/google_recaptcha/models/ir_http.py
 #, python-format
 msgid "The reCaptcha private key is invalid."
 msgstr "reCaptcha privatni ključ nije važeći."
 
 #. module: google_recaptcha
 #. odoo-python
-#: code:addons/google_recaptcha/models/ir_http.py:0
+#: code:addons/google_recaptcha/models/ir_http.py
 #, python-format
 msgid "The reCaptcha token is invalid."
 msgstr "reCaptcha token nije važeći."
 
 #. module: google_recaptcha
 #. odoo-javascript
-#: code:addons/google_recaptcha/static/src/js/recaptcha.js:0
+#: code:addons/google_recaptcha/static/src/js/recaptcha.js
 #, python-format
 msgid "The recaptcha site key is invalid."
 msgstr "Recaptcha ključ stranice nije važeći."
 
 #. module: google_recaptcha
 #. odoo-python
-#: code:addons/google_recaptcha/models/ir_http.py:0
+#: code:addons/google_recaptcha/models/ir_http.py
 #, python-format
 msgid "The request is invalid or malformed."
 msgstr "Zahtjev nije važeći ili je oštećen."
 
 #. module: google_recaptcha
 #. odoo-python
-#: code:addons/google_recaptcha/models/ir_http.py:0
+#: code:addons/google_recaptcha/models/ir_http.py
 #, python-format
 msgid "Your request has timed out, please retry."
 msgstr "Vaš zahtjev je istekao, molimo pokušajte ponovno."
 
 #. module: google_recaptcha
 #. odoo-javascript
-#: code:addons/google_recaptcha/static/src/xml/recaptcha.xml:0
+#: code:addons/google_recaptcha/static/src/xml/recaptcha.xml
 #, python-format
 msgid "apply."
 msgstr "primijeni."
