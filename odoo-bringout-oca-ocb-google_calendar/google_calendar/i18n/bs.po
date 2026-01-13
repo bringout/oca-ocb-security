@@ -370,7 +370,7 @@ msgstr "Uspjeh"
 #. module: google_calendar
 #: model:ir.model,name:google_calendar.model_google_calendar_sync
 msgid "Synchronize a record with Google Calendar"
-msgstr "Sinkroniziraj zapis s Google kalendarom"
+msgstr "Sinhroniziraj zapis s Google kalendarom"
 
 #. module: google_calendar
 #: model:ir.model.fields.selection,name:google_calendar.selection__google_calendar_account_reset__sync_policy__all
