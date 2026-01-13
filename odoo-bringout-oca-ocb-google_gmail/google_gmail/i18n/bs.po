@@ -92,7 +92,7 @@ msgstr "Autorizacijski kod"
 #. module: google_gmail
 #: model:ir.model,name:google_gmail.model_res_config_settings
 msgid "Config Settings"
-msgstr "Postavke konfiguracije"
+msgstr "Postavke"
 
 #. module: google_gmail
 #. odoo-python

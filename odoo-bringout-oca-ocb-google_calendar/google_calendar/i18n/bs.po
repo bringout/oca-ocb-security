@@ -107,7 +107,9 @@ msgstr "ID kalendara"
 #. module: google_calendar
 #: model_terms:ir.ui.view,arch_db:google_calendar.google_calendar_reset_account_view_form
 msgid "Cancel"
-msgstr "Otkaži"
+msgstr ""
+"Svi događaji su prekinu ti sa vašeg prethodnog računa. Sada možete ponovo "
+"pokrenuti sinhronizaciju"
 
 # taken from hr.po
 #. module: google_calendar
@@ -137,7 +139,7 @@ msgstr "Client_key"
 #. module: google_calendar
 #: model:ir.model,name:google_calendar.model_res_config_settings
 msgid "Config Settings"
-msgstr "Postavke konfiguracije"
+msgstr "Postavke"
 
 # taken from hr.po
 #. module: google_calendar
@@ -157,7 +159,7 @@ msgstr "Potvrdi"
 #. module: google_calendar
 #: model:ir.model.fields,field_description:google_calendar.field_google_calendar_account_reset__create_uid
 msgid "Created by"
-msgstr "Kreirao"
+msgstr "Odoo datum ažuriranja"
 
 # taken from hr.po
 #. module: google_calendar
@@ -285,26 +287,26 @@ msgid ""
 "Last Calendar ID who has been synchronized. If it is changed, we remove all "
 "links between GoogleID and Odoo Google Internal ID"
 msgstr ""
-"Zadnji ID kalendara koji je bio sinkroniziran. Ako se promijeni, uklanjamo "
+"Zadnji ID kalendara koji je bio sinhroniziran. Ako se promijeni, uklanjamo "
 "sve veze između GoogleID i Odoo Google internog ID"
 
 # taken from hr.po
 #. module: google_calendar
 #: model:ir.model.fields,field_description:google_calendar.field_google_calendar_account_reset____last_update
 msgid "Last Modified on"
-msgstr "Zadnja izmjena na"
+msgstr "Zadnje mijenjano"
 
 # taken from hr.po
 #. module: google_calendar
 #: model:ir.model.fields,field_description:google_calendar.field_google_calendar_account_reset__write_uid
 msgid "Last Updated by"
-msgstr "Zadnje ažuriranje izvršio"
+msgstr "Promijenio"
 
 # taken from hr.po
 #. module: google_calendar
 #: model:ir.model.fields,field_description:google_calendar.field_google_calendar_account_reset__write_date
 msgid "Last Updated on"
-msgstr "Zadnje ažuriranje na"
+msgstr "Vrijeme promjene"
 
 # taken from hr.po
 #. module: google_calendar
@@ -315,7 +317,7 @@ msgstr "Ostavi ih nedirnute"
 #. module: google_calendar
 #: model:ir.model.fields,field_description:google_calendar.field_calendar_event__need_sync
 msgid "Need Sync"
-msgstr "Potrebno sinkronizirati"
+msgstr "Potrebno sinhronizirati"
 
 #. module: google_calendar
 #: model:ir.model.fields,field_description:google_calendar.field_google_calendar_credentials__calendar_sync_token
@@ -406,8 +408,8 @@ msgid ""
 "The following event could not be synced with Google Calendar. </br>It will "
 "not be synced as long at it is not updated.</br>%(reason)s"
 msgstr ""
-"Sljedeći događaj se nije mogao sinkronizirati s Google kalendarom. </br>Neće"
-" se sinkronizirati sve dok se ne ažurira.</br>%(reason)s"
+"Sljedeći događaj se nije mogao sinhronizirati s Google kalendarom. </br>Neće"
+" se sinhronizirati sve dok se ne ažurira.</br>%(reason)s"
 
 #. module: google_calendar
 #. odoo-javascript
