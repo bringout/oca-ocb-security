@@ -33,7 +33,7 @@ msgstr ""
 #. module: google_recaptcha
 #: model:ir.model,name:google_recaptcha.model_res_config_settings
 msgid "Config Settings"
-msgstr "Postavke"
+msgstr "Postavke konfiguracije"
 
 # taken from hr.po
 #. module: google_recaptcha

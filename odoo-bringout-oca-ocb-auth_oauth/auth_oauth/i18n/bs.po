@@ -80,7 +80,7 @@ msgstr "ID klijenta:"
 #. module: auth_oauth
 #: model:ir.model,name:auth_oauth.model_res_config_settings
 msgid "Config Settings"
-msgstr "Postavke"
+msgstr "Postavke konfiguracije"
 
 # taken from hr.po
 #. module: auth_oauth
@@ -126,19 +126,19 @@ msgstr "ID"
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider____last_update
 msgid "Last Modified on"
-msgstr "Zadnje mijenjano"
+msgstr "Zadnja izmjena na"
 
 # taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__write_uid
 msgid "Last Updated by"
-msgstr "Zadnji ažurirao"
+msgstr "Zadnje ažuriranje izvršio"
 
 # taken from hr.po
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__write_date
 msgid "Last Updated on"
-msgstr "Zadnje ažurirano"
+msgstr "Zadnje ažuriranje na"
 
 # taken from hr.po
 #. module: auth_oauth

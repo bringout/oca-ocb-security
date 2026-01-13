@@ -672,7 +672,7 @@ msgstr "Zatvori"
 #. module: auth_signup
 #: model:ir.model,name:auth_signup.model_res_config_settings
 msgid "Config Settings"
-msgstr "Postavke"
+msgstr "Postavke konfiguracije"
 
 # taken from hr.po
 #. module: auth_signup
