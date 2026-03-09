@@ -1,14 +1,14 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import http
 from odoo.http import request
+from odoo.addons.calendar.controllers.main import CalendarController
 
 
-class MicrosoftCalendarController(http.Controller):
+class MicrosoftCalendarController(CalendarController):
 
-    @http.route('/microsoft_calendar/sync_data', type='json', auth='user')
-    def sync_data(self, model, **kw):
+    @http.route('/microsoft_calendar/sync_data', type='jsonrpc', auth='user')
+    def microsoft_calendar_sync_data(self, model, **kw):
         """ This route/function is called when we want to synchronize Odoo
             calendar with Microsoft Calendar.
             Function return a dictionary with the status :  need_config_from_admin, need_auth,
@@ -20,7 +20,7 @@ class MicrosoftCalendarController(http.Controller):
             MicrosoftCal = request.env["calendar.event"]._get_microsoft_service()
 
             # Checking that admin have already configured Microsoft API for microsoft synchronization !
-            client_id = request.env['ir.config_parameter'].sudo().get_param('microsoft_calendar_client_id')
+            client_id = request.env['microsoft.service']._get_microsoft_client_id('calendar')
 
             if not client_id or client_id == '':
                 action_id = ''
@@ -43,10 +43,11 @@ class MicrosoftCalendarController(http.Controller):
             # If App authorized, and user access accepted, We launch the synchronization
             need_refresh = request.env.user.sudo().with_context(dont_notify=True)._sync_microsoft_calendar()
 
-            # If synchronization has been stopped
-            if not need_refresh and request.env.user.microsoft_synchronization_stopped:
+            # If synchronization has been stopped or paused
+            sync_status = request.env.user._get_microsoft_sync_status()
+            if not need_refresh and sync_status != "sync_active":
                 return {
-                    "status": "sync_stopped",
+                    "status": sync_status,
                     "url": ''
                 }
             return {

@@ -1,3 +1,5 @@
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
+
 import pytz
 from datetime import datetime, timedelta
 from markupsafe import Markup
@@ -8,9 +10,10 @@ from freezegun import freeze_time
 from odoo import fields
 
 from odoo.tests.common import HttpCase
+from odoo.tools import mute_logger
 
-from odoo.addons.microsoft_calendar.models.microsoft_sync import MicrosoftSync
-from odoo.addons.microsoft_calendar.utils.event_id_storage import combine_ids
+from odoo.addons.microsoft_calendar.models.microsoft_sync import MicrosoftCalendarSync
+
 
 def mock_get_token(user):
     return f"TOKEN_FOR_USER_{user.id}"
@@ -23,14 +26,14 @@ def _modified_date_in_the_future(event):
     return (event.write_date + timedelta(seconds=5)).strftime("%Y-%m-%dT%H:%M:%SZ")
 
 def patch_api(func):
-    @patch.object(MicrosoftSync, '_microsoft_insert', MagicMock())
-    @patch.object(MicrosoftSync, '_microsoft_delete', MagicMock())
-    @patch.object(MicrosoftSync, '_microsoft_patch', MagicMock())
+    @patch.object(MicrosoftCalendarSync, '_microsoft_insert', MagicMock())
+    @patch.object(MicrosoftCalendarSync, '_microsoft_delete', MagicMock())
+    @patch.object(MicrosoftCalendarSync, '_microsoft_patch', MagicMock())
     def patched(self, *args, **kwargs):
         return func(self, *args, **kwargs)
     return patched
 
-# By inheriting from TransactionCase, postcommit hooks (so methods tagged with `@after_commit` in MicrosoftSync),
+# By inheriting from TransactionCase, postcommit hooks (so methods tagged with `@after_commit` in MicrosoftCalendarSync),
 # are not called because no commit is done.
 # To be able to manually call these postcommit hooks, we need to inherit from HttpCase.
 # Note: as postcommit hooks are called separately, do not forget to invalidate cache for records read during the test.
@@ -39,6 +42,11 @@ class TestCommon(HttpCase):
     @patch_api
     def setUp(self):
         super(TestCommon, self).setUp()
+        m = mute_logger('odoo.addons.auth_signup.models.res_users')
+        mute_logger.__enter__(m)  # noqa: PLC2801
+        self.addCleanup(mute_logger.__exit__, m, None, None, None)
+
+        self.env.user.unpause_microsoft_synchronization()
 
         # prepare users
         self.organizer_user = self.env["res.users"].search([("name", "=", "Mike Organizer")])
@@ -249,7 +257,8 @@ class TestCommon(HttpCase):
             "start": self.start_date,
             "stop": self.end_date,
             "user_id": self.organizer_user,
-            "microsoft_id": combine_ids("123", "456"),
+            "microsoft_id": "123",
+            "ms_universal_event_id": "456",
             "partner_ids": [self.organizer_user.partner_id.id, self.attendee_user.partner_id.id],
         }
         self.expected_odoo_recurrency_from_outlook = {
@@ -266,7 +275,8 @@ class TestCommon(HttpCase):
             'fri': False,
             'interval': self.recurrent_event_interval,
             'month_by': 'date',
-            'microsoft_id': combine_ids('REC123', 'REC456'),
+            "microsoft_id": "REC123",
+            "ms_universal_event_id": "REC456",
             'name': "Every %s Days until %s" % (
                 self.recurrent_event_interval, self.recurrence_end_date.strftime("%Y-%m-%d")
             ),
@@ -405,7 +415,8 @@ class TestCommon(HttpCase):
                 "stop": self.end_date + timedelta(days=i * self.recurrent_event_interval),
                 "until": self.recurrence_end_date.date(),
                 "microsoft_recurrence_master_id": "REC123",
-                'microsoft_id': combine_ids(f"REC123_EVENT_{i+1}", f"REC456_EVENT_{i+1}"),
+                "microsoft_id": f"REC123_EVENT_{i+1}",
+                "ms_universal_event_id": f"REC456_EVENT_{i+1}",
                 "recurrency": True,
                 "follow_recurrence": True,
                 "active": True,
@@ -445,7 +456,8 @@ class TestCommon(HttpCase):
             self.simple_event = self.env["calendar.event"].with_user(self.organizer_user).create(
                 dict(
                     self.simple_event_values,
-                    microsoft_id=combine_ids("123", "456"),
+                    microsoft_id="123",
+                    ms_universal_event_id="456",
                 )
             )
 
@@ -456,7 +468,8 @@ class TestCommon(HttpCase):
                 dict(
                     self.simple_event_values,
                     name=f"event{i}",
-                    microsoft_id=combine_ids(f"e{i}", f"u{i}"),
+                    microsoft_id=f"e{i}",
+                    ms_universal_event_id=f"u{i}"
                 )
                 for i in range(1, 4)
             ])
@@ -483,11 +496,13 @@ class TestCommon(HttpCase):
         # set ids set by Outlook
         if not already_created:
             self.recurrence.with_context(dont_notify=True).write({
-                "microsoft_id": combine_ids("REC123", "REC456"),
+                "microsoft_id": "REC123",
+                "ms_universal_event_id": "REC456"
             })
             for i, e in enumerate(self.recurrence.calendar_event_ids.sorted(key=lambda r: r.start)):
                 e.with_context(dont_notify=True).write({
-                    "microsoft_id": combine_ids(f"REC123_EVENT_{i+1}", f"REC456_EVENT_{i+1}"),
+                    "microsoft_id": f"REC123_EVENT_{i+1}",
+                    "ms_universal_event_id": f"REC456_EVENT_{i+1}",
                     "microsoft_recurrence_master_id": "REC123",
                 })
             self.recurrence.invalidate_recordset()

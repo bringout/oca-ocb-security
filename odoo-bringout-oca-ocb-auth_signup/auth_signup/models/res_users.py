@@ -1,52 +1,34 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
+import contextlib
 import logging
 
 from ast import literal_eval
-from collections import defaultdict
 from dateutil.relativedelta import relativedelta
 
 from odoo import api, fields, models, _
 from odoo.exceptions import UserError
-from odoo.osv import expression
-from odoo.tools.misc import ustr
+from odoo.fields import Domain
 
 from odoo.addons.base.models.ir_mail_server import MailDeliveryException
-from odoo.addons.auth_signup.models.res_partner import SignupError, now
+from odoo.addons.auth_signup.models.res_partner import SignupError
 
 _logger = logging.getLogger(__name__)
+
 
 class ResUsers(models.Model):
     _inherit = 'res.users'
 
     state = fields.Selection(compute='_compute_state', search='_search_state', string='Status',
-                 selection=[('new', 'Never Connected'), ('active', 'Confirmed')])
+                 selection=[('new', 'Invited'), ('active', 'Confirmed')])
 
     def _search_state(self, operator, value):
-        negative = operator in expression.NEGATIVE_TERM_OPERATORS
-
-        # In case we have no value
-        if not value:
-            return expression.TRUE_DOMAIN if negative else expression.FALSE_DOMAIN
-
-        if operator in ['in', 'not in']:
-            if len(value) > 1:
-                return expression.FALSE_DOMAIN if negative else expression.TRUE_DOMAIN
-            if value[0] == 'new':
-                comp = '!=' if negative else '='
-            if value[0] == 'active':
-                comp = '=' if negative else '!='
-            return [('log_ids', comp, False)]
-
-        if operator in ['=', '!=']:
-            # In case we search against anything else than new, we have to invert the operator
-            if value != 'new':
-                operator = expression.TERM_OPERATORS_NEGATION[operator]
-
-            return [('log_ids', operator, False)]
-
-        return expression.TRUE_DOMAIN
+        if operator != 'in':
+            return NotImplemented
+        if len(value) > 1:
+            return Domain.TRUE
+        in_log = 'active' in value
+        return Domain('log_ids', '!=' if in_log else '=', False)
 
     def _compute_state(self):
         for user in self:
@@ -66,8 +48,7 @@ class ResUsers(models.Model):
             # signup with a token: find the corresponding partner id
             partner = self.env['res.partner']._signup_retrieve_partner(token, check_validity=True, raise_exception=True)
             # invalidate signup token
-            partner.write({'signup_token': False, 'signup_type': False, 'signup_expiration': False})
-
+            partner.write({'signup_type': False})
             partner_user = partner.user_ids and partner.user_ids[0] or False
 
             # avoid overwriting existing (presumably correct) values with geolocation data
@@ -82,7 +63,7 @@ class ResUsers(models.Model):
                 values.pop('login', None)
                 values.pop('name', None)
                 partner_user.write(values)
-                if not partner_user.login_date:
+                if not partner_user.login_date and partner_user._is_internal():
                     partner_user._notify_inviter()
                 return (partner_user.login, values.get('password'))
             else:
@@ -96,7 +77,6 @@ class ResUsers(models.Model):
                     values['company_id'] = partner.company_id.id
                     values['company_ids'] = [(6, 0, [partner.company_id.id])]
                 partner_user = self._signup_create_user(values)
-                partner_user._notify_inviter()
         else:
             # no token, sign up an external user
             values['email'] = values.get('email') or values.get('login')
@@ -120,13 +100,10 @@ class ResUsers(models.Model):
 
     def _notify_inviter(self):
         for user in self:
-            invite_partner = user.create_uid.partner_id
-            if invite_partner:
-                # notify invite user that new user is connected
-                self.env['bus.bus']._sendone(invite_partner, 'res.users/connection', {
-                    'username': user.name,
-                    'partnerId': user.partner_id.id,
-                })
+            # notify invite user that new user is connected
+            user.create_uid._bus_send(
+                "res.users/connection", {"username": user.name, "partnerId": user.partner_id.id}
+            )
 
     def _create_user_from_template(self, values):
         template_user_id = literal_eval(self.env['ir.config_parameter'].sudo().get_param('base.template_portal_user_id', 'False'))
@@ -146,7 +123,7 @@ class ResUsers(models.Model):
                 return template_user.with_context(no_reset_password=True).copy(values)
         except Exception as e:
             # copy may failed if asked login is not available.
-            raise SignupError(ustr(e))
+            raise SignupError(str(e))
 
     def reset_password(self, login):
         """ retrieve the user corresponding to login (login or email),
@@ -162,29 +139,43 @@ class ResUsers(models.Model):
         return users.action_reset_password()
 
     def action_reset_password(self):
+        try:
+            if self.env.context.get('create_user') == 1:
+                return self._action_reset_password(signup_type="signup")
+            else:
+                return self._action_reset_password(signup_type="reset")
+        except MailDeliveryException as mde:
+            if len(mde.args) == 2 and isinstance(mde.args[1], ConnectionRefusedError):
+                raise UserError(_("Could not contact the mail server, please check your outgoing email server configuration")) from mde
+            else:
+                raise UserError(_("There was an error when trying to deliver your Email, please check your configuration")) from mde
+
+    def _action_reset_password(self, signup_type="reset"):
         """ create signup token for each user, and send their signup url by email """
-        if self.env.context.get('install_mode', False):
+        if self.env.context.get('install_mode') or self.env.context.get('import_file'):
             return
         if self.filtered(lambda user: not user.active):
             raise UserError(_("You cannot perform this action on an archived user."))
         # prepare reset password signup
         create_mode = bool(self.env.context.get('create_user'))
 
-        # no time limit for initial invitation, only for reset password
-        expiration = False if create_mode else now(days=+1)
-
-        self.mapped('partner_id').signup_prepare(signup_type="reset", expiration=expiration)
+        self.mapped('partner_id').signup_prepare(signup_type=signup_type)
 
         # send email to users with their signup url
-        template = False
+        internal_account_created_template = None
+        portal_account_created_template = None
         if create_mode:
-            try:
-                template = self.env.ref('auth_signup.set_password_email', raise_if_not_found=False)
-            except ValueError:
-                pass
-        if not template:
-            template = self.env.ref('auth_signup.reset_password_email')
-        assert template._name == 'mail.template'
+            if any(user._is_internal() for user in self):
+                internal_account_created_template = self.env.ref('auth_signup.set_password_email', raise_if_not_found=False)
+                if internal_account_created_template and internal_account_created_template._name != 'mail.template':
+                    _logger.error("Wrong set password template %r", internal_account_created_template)
+                    return
+
+            if any(not user._is_internal() for user in self):
+                portal_account_created_template = self.env.ref('auth_signup.portal_set_password_email', raise_if_not_found=False)
+                if portal_account_created_template and portal_account_created_template._name != 'mail.template':
+                    _logger.error("Wrong set password template %r", portal_account_created_template)
+                    return
 
         email_values = {
             'email_cc': False,
@@ -199,36 +190,69 @@ class ResUsers(models.Model):
             if not user.email:
                 raise UserError(_("Cannot send email: user %s has no email address.", user.name))
             email_values['email_to'] = user.email
-            # TDE FIXME: make this template technical (qweb)
-            with self.env.cr.savepoint():
-                force_send = not(self.env.context.get('import_file', False))
-                template.send_mail(user.id, force_send=force_send, raise_exception=True, email_values=email_values)
-            _logger.info("Password reset email sent for user <%s> to <%s>", user.login, user.email)
+            with contextlib.closing(self.env.cr.savepoint()):
+                is_internal = user._is_internal()
+                account_created_template = internal_account_created_template if is_internal else portal_account_created_template
+                if account_created_template:
+                    account_created_template.send_mail(
+                        user.id, force_send=True,
+                        raise_exception=True, email_values=email_values)
+                else:
+                    user_lang = user.lang or self.env.lang or 'en_US'
+                    body = self.env['mail.render.mixin'].with_context(lang=user_lang)._render_template(
+                        self.env.ref('auth_signup.reset_password_email'),
+                        model='res.users', res_ids=user.ids,
+                        engine='qweb_view', options={'post_process': True})[user.id]
+                    mail = self.env['mail.mail'].sudo().create({
+                        'subject': self.with_context(lang=user_lang).env._('Password reset'),
+                        'email_from': user.company_id.email_formatted or user.email_formatted,
+                        'body_html': body,
+                        **email_values,
+                    })
+                    mail.send()
+            if signup_type == 'reset':
+                _logger.info("Password reset email sent for user <%s> to <%s>", user.login, user.email)
+                message = _('A reset password link was sent by email')
+            else:
+                _logger.info("Signup email sent for user <%s> to <%s>", user.login, user.email)
+                message = _('A signup link was sent by email')
+        return {
+            'type': 'ir.actions.client',
+            'tag': 'display_notification',
+            'params': {
+                'title': 'Notification',
+                'message': message,
+                'sticky': False
+            }
+        }
 
-    def send_unregistered_user_reminder(self, after_days=5):
+    def send_unregistered_user_reminder(self, *, after_days=5, batch_size=100):
         email_template = self.env.ref('auth_signup.mail_template_data_unregistered_users', raise_if_not_found=False)
         if not email_template:
             _logger.warning("Template 'auth_signup.mail_template_data_unregistered_users' was not found. Cannot send reminder notifications.")
+            self.env['ir.cron']._commit_progress(deactivate=True)
             return
         datetime_min = fields.Datetime.today() - relativedelta(days=after_days)
-        datetime_max = datetime_min + relativedelta(hours=23, minutes=59, seconds=59)
+        datetime_max = datetime_min + relativedelta(days=1)
 
-        res_users_with_details = self.env['res.users'].search_read([
+        invited_by_users = self.search_fetch([
             ('share', '=', False),
             ('create_uid.email', '!=', False),
             ('create_date', '>=', datetime_min),
-            ('create_date', '<=', datetime_max),
-            ('log_ids', '=', False)], ['create_uid', 'name', 'login'])
+            ('create_date', '<', datetime_max),
+            ('log_ids', '=', False),
+        ], ['name', 'login', 'create_uid']).grouped('create_uid')
 
-        # group by invited by
-        invited_users = defaultdict(list)
-        for user in res_users_with_details:
-            invited_users[user.get('create_uid')[0]].append("%s (%s)" % (user.get('name'), user.get('login')))
+        # Do not use progress since we have no way of knowing to whom we have
+        # already sent e-mails.
 
-        # For sending mail to all the invitors about their invited users
-        for user in invited_users:
-            template = email_template.with_context(dbname=self._cr.dbname, invited_users=invited_users[user])
-            template.send_mail(user, email_layout_xmlid='mail.mail_notification_light', force_send=False)
+        for user, invited_users in invited_by_users.items():
+            invited_user_emails = [f"{u.name} ({u.login})" for u in invited_users]
+            template = email_template.with_context(dbname=self.env.cr.dbname, invited_users=invited_user_emails)
+            template.send_mail(user.id, email_layout_xmlid='mail.mail_notification_light', force_send=False)
+            if not self.env['ir.cron']._commit_progress(len(invited_users)):
+                _logger.info("send_unregistered_user_reminder: timeout reached, stopping")
+                break
 
     @api.model
     def web_create_users(self, emails):
@@ -247,16 +271,25 @@ class ResUsers(models.Model):
             users_with_email = users.filtered('email')
             if users_with_email:
                 try:
-                    users_with_email.with_context(create_user=True).action_reset_password()
+                    users_with_email.with_context(create_user=True)._action_reset_password(signup_type='signup')
                 except MailDeliveryException:
                     users_with_email.partner_id.with_context(create_user=True).signup_cancel()
         return users
 
-    @api.returns('self', lambda value: value.id)
+    def write(self, vals):
+        if 'active' in vals and not vals['active']:
+            self.partner_id.sudo().signup_cancel()
+        return super().write(vals)
+
+    @api.ondelete(at_uninstall=False)
+    def _ondelete_signup_cancel(self):
+        # Cancel pending partner signup when the user is deleted.
+        for user in self:
+            if user.partner_id:
+                user.partner_id.signup_cancel()
+
     def copy(self, default=None):
-        self.ensure_one()
-        sup = super(ResUsers, self)
         if not default or not default.get('email'):
             # avoid sending email to the user we are duplicating
-            sup = super(ResUsers, self.with_context(no_reset_password=True))
-        return sup.copy(default=default)
+            self = self.with_context(no_reset_password=True)
+        return super().copy(default=default)

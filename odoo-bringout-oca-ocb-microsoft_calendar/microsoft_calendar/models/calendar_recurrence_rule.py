@@ -1,19 +1,16 @@
-# -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, fields, models
-from odoo.osv import expression
+from odoo.fields import Domain
 
 
-class RecurrenceRule(models.Model):
+class CalendarRecurrence(models.Model):
     _name = 'calendar.recurrence'
     _inherit = ['calendar.recurrence', 'microsoft.calendar.sync']
 
 
     # Don't sync by default. Sync only when the recurrence is applied
     need_sync_m = fields.Boolean(default=False)
-
-    microsoft_id = fields.Char('Microsoft Calendar Recurrence Id')
 
     def _compute_rrule(self):
         # Note: 'need_sync_m' is set to False to avoid syncing the updated recurrence with
@@ -43,14 +40,15 @@ class RecurrenceRule(models.Model):
                 vals += [{
                     'name': event.name,
                     'microsoft_id': event.microsoft_id,
+                    'ms_universal_event_id': event.ms_universal_event_id,
                     'start': event.start,
                     'stop': event.stop,
                     'active': False,
                     'need_sync_m': True,
                 }]
-                event._microsoft_delete(event.user_id, event.ms_organizer_event_id)
+                event._microsoft_delete(event.user_id, event.microsoft_id)
                 event.ms_universal_event_id = False
-        self.env['calendar.event'].create(vals)
+        self.env['calendar.event'].with_context(skip_contact_description=True).create(vals)
         self.calendar_event_ids.need_sync_m = False
         return detached_events
 
@@ -108,9 +106,10 @@ class RecurrenceRule(models.Model):
             # We archive the old events to recompute the recurrence. These events are already deleted on Microsoft side.
             # We can't call _cancel because events without user_id would not be deleted
             (self.calendar_event_ids - base_event_id).microsoft_id = False
+            (self.calendar_event_ids - base_event_id).ms_universal_event_id = False
             (self.calendar_event_ids - base_event_id).unlink()
             base_event_id.with_context(dont_notify=True).write(dict(
-                new_event_values, microsoft_id=False, need_sync_m=False
+                new_event_values, microsoft_id=False, ms_universal_event_id=False, need_sync_m=False
             ))
             if self.rrule == current_rrule:
                 # if the rrule has changed, it will be recalculated below
@@ -132,13 +131,12 @@ class RecurrenceRule(models.Model):
         # to base_event start datetime.
         if self.rrule != current_rrule:
             detached_events = self._apply_recurrence()
-            detached_events.microsoft_id = False
+            detached_events.ms_universal_event_id = False
             detached_events.unlink()
 
     def _get_microsoft_sync_domain(self):
         # Do not sync Odoo recurrences with Outlook Calendar anymore.
-        domain = expression.FALSE_DOMAIN
-        return self._extend_microsoft_domain(domain)
+        return self._extend_microsoft_domain(Domain.FALSE)
 
     def _cancel_microsoft(self):
         self.calendar_event_ids.with_context(dont_notify=True)._cancel_microsoft()
@@ -151,18 +149,18 @@ class RecurrenceRule(models.Model):
         if with_ids:
             recurrence = {
                 **recurrence,
-                'ms_organizer_event_id': microsoft_recurrence.id,
+                'microsoft_id': microsoft_recurrence.id,
                 'ms_universal_event_id': microsoft_recurrence.iCalUId,
             }
 
         return recurrence
 
-    def _microsoft_values(self, fields_to_sync):
+    def _microsoft_values(self, fields_to_sync, initial_values=()):
         """
         Get values to update the whole Outlook event recurrence.
         (done through the first event of the Outlook recurrence).
         """
-        return self.base_event_id._microsoft_values(fields_to_sync, initial_values={'type': 'seriesMaster'})
+        return self.base_event_id._microsoft_values(fields_to_sync, initial_values={**dict(initial_values), 'type': 'seriesMaster'})
 
     def _ensure_attendees_have_email(self):
         self.calendar_event_ids.filtered(lambda e: e.active)._ensure_attendees_have_email()
@@ -178,7 +176,7 @@ class RecurrenceRule(models.Model):
         if new_recurrence and new_recurrence.base_event_id.microsoft_id:
             new_recurrence.base_event_id._microsoft_delete(
                 new_recurrence.base_event_id._get_organizer(),
-                new_recurrence.base_event_id.ms_organizer_event_id
+                new_recurrence.base_event_id.microsoft_id
             )
 
         return new_recurrence
@@ -190,3 +188,9 @@ class RecurrenceRule(models.Model):
         if event:
             return event._get_event_user_m(user_id)
         return self.env.user
+
+    def _is_microsoft_insertion_blocked(self, sender_user):
+        self.ensure_one()
+        has_base_event = self.base_event_id
+        has_different_owner = self.base_event_id.user_id and self.base_event_id.user_id != sender_user
+        return has_base_event and has_different_owner

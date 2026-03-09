@@ -5,10 +5,9 @@ import ldap
 import logging
 from ldap.filter import filter_format
 
-from odoo import _, api, fields, models, tools
+from odoo import _, fields, models, tools
 from odoo.exceptions import AccessDenied
 from odoo.tools.misc import str2bool
-from odoo.tools.pycompat import to_text
 
 _logger = logging.getLogger(__name__)
 
@@ -30,7 +29,7 @@ class LDAPWrapper:
         self.__obj__.unbind(*args, **kwargs)
 
 
-class CompanyLDAP(models.Model):
+class ResCompanyLdap(models.Model):
     _name = 'res.company.ldap'
     _description = 'Company LDAP configuration'
     _order = 'sequence'
@@ -80,8 +79,7 @@ class CompanyLDAP(models.Model):
         :rtype: list of dictionaries
         """
 
-        ldaps = self.sudo().search([('ldap_server', '!=', False)], order='sequence')
-        res = ldaps.read([
+        res = self.sudo().search_read([('ldap_server', '!=', False)], [
             'id',
             'company',
             'ldap_server',
@@ -93,7 +91,7 @@ class CompanyLDAP(models.Model):
             'user',
             'create_user',
             'ldap_tls'
-        ])
+        ], order='sequence')
         return res
 
     def _connect(self, conf):
@@ -108,7 +106,7 @@ class CompanyLDAP(models.Model):
         uri = 'ldap://%s:%d' % (conf['ldap_server'], conf['ldap_server_port'])
 
         connection = ldap.initialize(uri)
-        ldap_chase_ref_disabled = self.env['ir.config_parameter'].sudo().get_param('auth_ldap.disable_chase_ref')
+        ldap_chase_ref_disabled = self.env['ir.config_parameter'].sudo().get_param('auth_ldap.disable_chase_ref', 'True')
         if str2bool(ldap_chase_ref_disabled):
             connection.set_option(ldap.OPT_REFERRALS, ldap.OPT_OFF)
         if conf['ldap_tls']:
@@ -154,7 +152,7 @@ class CompanyLDAP(models.Model):
             return False
         try:
             conn = self._connect(conf)
-            conn.simple_bind_s(dn, to_text(password))
+            conn.simple_bind_s(dn, password)
             conn.unbind()
         except ldap.INVALID_CREDENTIALS:
             return False
@@ -191,8 +189,8 @@ class CompanyLDAP(models.Model):
             conn = self._connect(conf)
             ldap_password = conf['ldap_password'] or ''
             ldap_binddn = conf['ldap_binddn'] or ''
-            conn.simple_bind_s(to_text(ldap_binddn), to_text(ldap_password))
-            results = conn.search_st(to_text(conf['ldap_base']), ldap.SCOPE_SUBTREE, filter, retrieve_attributes, timeout=60)
+            conn.simple_bind_s(ldap_binddn, ldap_password)
+            results = conn.search_st(conf['ldap_base'], ldap.SCOPE_SUBTREE, filter, retrieve_attributes, timeout=60)
             conn.unbind()
         except ldap.INVALID_CREDENTIALS:
             _logger.error('LDAP bind failed.')
@@ -211,7 +209,7 @@ class CompanyLDAP(models.Model):
         :rtype: dict
         """
         data = {
-            'name': tools.ustr(ldap_entry[1]['cn'][0]),
+            'name': ldap_entry[1]['cn'][0],
             'login': login,
             'company_id': conf['company'][0]
         }
@@ -230,7 +228,7 @@ class CompanyLDAP(models.Model):
         :return: res_users id
         :rtype: int
         """
-        login = tools.ustr(login.lower().strip())
+        login = login.lower().strip()
         self.env.cr.execute("SELECT id, active FROM res_users WHERE lower(login)=%s", (login,))
         res = self.env.cr.fetchone()
         if res:
@@ -255,7 +253,7 @@ class CompanyLDAP(models.Model):
             return False
         try:
             conn = self._connect(conf)
-            conn.simple_bind_s(dn, to_text(old_passwd))
+            conn.simple_bind_s(dn, old_passwd)
             conn.passwd_s(dn, old_passwd, new_passwd)
             changed = True
             conn.unbind()
@@ -264,3 +262,89 @@ class CompanyLDAP(models.Model):
         except ldap.LDAPError as e:
             _logger.error('An LDAP exception occurred: %s', e)
         return changed
+
+    def test_ldap_connection(self):
+        """
+        Test the LDAP connection using the current configuration.
+        Returns a dictionary with notification parameters indicating success or failure.
+        """
+        conf = {
+            'ldap_server': self.ldap_server,
+            'ldap_server_port': self.ldap_server_port,
+            'ldap_binddn': self.ldap_binddn,
+            'ldap_password': self.ldap_password,
+            'ldap_base': self.ldap_base,
+            'ldap_tls': self.ldap_tls
+        }
+
+        bind_dn = self.ldap_binddn or ''
+        bind_passwd = self.ldap_password or ''
+
+        try:
+            conn = self._connect(conf)
+            conn.simple_bind_s(bind_dn, bind_passwd)
+            conn.unbind()
+
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'type': 'success',
+                    'title': _('Connection Test Successful!'),
+                    'message': _("Successfully connected to LDAP server at %(server)s:%(port)d",
+                                 server=self.ldap_server, port=self.ldap_server_port),
+                    'sticky': False,
+                }
+            }
+
+        except ldap.SERVER_DOWN:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'type': 'danger',
+                    'title': _('Connection Test Failed!'),
+                    'message': _("Cannot contact LDAP server at %(server)s:%(port)d",
+                                 server=self.ldap_server, port=self.ldap_server_port),
+                    'sticky': False,
+                }
+            }
+
+        except ldap.INVALID_CREDENTIALS:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'type': 'danger',
+                    'title': _('Connection Test Failed!'),
+                    'message': _("Invalid credentials for bind DN %(binddn)s",
+                                 binddn=self.ldap_binddn),
+                    'sticky': False,
+                }
+            }
+
+        except ldap.TIMEOUT:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'type': 'danger',
+                    'title': _('Connection Test Failed!'),
+                    'message': _("Connection to LDAP server at %(server)s:%(port)d timed out",
+                                 server=self.ldap_server, port=self.ldap_server_port),
+                    'sticky': False,
+                }
+            }
+
+        except ldap.LDAPError as e:
+            return {
+                'type': 'ir.actions.client',
+                'tag': 'display_notification',
+                'params': {
+                    'type': 'danger',
+                    'title': _('Connection Test Failed!'),
+                    'message': _("An error occurred: %(error)s",
+                                 error=e),
+                    'sticky': False,
+                }
+            }

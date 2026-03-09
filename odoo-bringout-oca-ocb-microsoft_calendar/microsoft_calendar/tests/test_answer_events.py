@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*-
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
+
 from unittest.mock import patch, ANY
 from datetime import datetime, timedelta
 
 from odoo.addons.microsoft_calendar.utils.microsoft_calendar import MicrosoftCalendarService
 from odoo.addons.microsoft_calendar.utils.microsoft_event import MicrosoftEvent
-from odoo.addons.microsoft_calendar.models.res_users import User
-from odoo.addons.microsoft_calendar.utils.event_id_storage import combine_ids
+from odoo.addons.microsoft_calendar.models.res_users import ResUsers
 from odoo.addons.microsoft_calendar.tests.common import TestCommon, mock_get_token, _modified_date_in_the_future, patch_api
 from odoo.tests import users
 
@@ -13,7 +13,7 @@ import json
 from freezegun import freeze_time
 
 
-@patch.object(User, '_get_microsoft_calendar_token', mock_get_token)
+@patch.object(ResUsers, '_get_microsoft_calendar_token', mock_get_token)
 class TestAnswerEvents(TestCommon):
 
     @patch_api
@@ -26,7 +26,8 @@ class TestAnswerEvents(TestCommon):
             self.simple_event = self.env["calendar.event"].with_user(self.organizer_user).create(
                 dict(
                     self.simple_event_values,
-                    microsoft_id=combine_ids("123", "456"),
+                    microsoft_id="123",
+                    ms_universal_event_id="456",
                 )
             )
         (self.organizer_user | self.attendee_user).microsoft_calendar_token_validity = datetime.now() + timedelta(hours=1)
@@ -38,14 +39,14 @@ class TestAnswerEvents(TestCommon):
             ('event_id', '=', self.simple_event.id),
             ('partner_id', '=', self.attendee_user.partner_id.id)
         ])
-        attendee_ms_organizer_event_id = 100
-        mock_get_single_event.return_value = (True, {'value': [{'id': attendee_ms_organizer_event_id}]})
+
+        mock_get_single_event.return_value = (True, {'value': [{'id': attendee.event_id.microsoft_id}]})
         attendee.with_user(self.attendee_user).do_accept()
         self.call_post_commit_hooks()
         self.simple_event.invalidate_recordset()
 
         mock_answer.assert_called_once_with(
-            attendee_ms_organizer_event_id,
+            self.simple_event.microsoft_id,
             'accept',
             {"comment": "", "sendResponse": True},
             token=mock_get_token(self.attendee_user),
@@ -59,13 +60,12 @@ class TestAnswerEvents(TestCommon):
             ('event_id', '=', self.simple_event.id),
             ('partner_id', '=', self.attendee_user.partner_id.id)
         ])
-        attendee_ms_organizer_event_id = 100
-        mock_get_single_event.return_value = (True, {'value': [{'id': attendee_ms_organizer_event_id}]})
+        mock_get_single_event.return_value = (True, {'value': [{'id': attendee.event_id.microsoft_id}]})
         attendee.with_user(self.attendee_user).do_decline()
         self.call_post_commit_hooks()
         self.simple_event.invalidate_recordset()
         mock_answer.assert_called_once_with(
-            attendee_ms_organizer_event_id,
+            self.simple_event.microsoft_id,
             'decline',
             {"comment": "", "sendResponse": True},
             token=mock_get_token(self.attendee_user),

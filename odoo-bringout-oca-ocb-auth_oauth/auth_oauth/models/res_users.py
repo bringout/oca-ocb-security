@@ -4,25 +4,45 @@
 import json
 
 import requests
-import werkzeug.http
+from werkzeug import http, datastructures
+
+if hasattr(datastructures.WWWAuthenticate, "from_header"):
+    parse_auth = datastructures.WWWAuthenticate.from_header
+else:
+    parse_auth = http.parse_www_authenticate_header
 
 from odoo import api, fields, models
-from odoo.exceptions import AccessDenied, UserError
+from odoo.exceptions import AccessDenied, AccessError, UserError
 from odoo.addons.auth_signup.models.res_users import SignupError
 
-from odoo.addons import base
-base.models.res_users.USER_PRIVATE_FIELDS.append('oauth_access_token')
 
 class ResUsers(models.Model):
     _inherit = 'res.users'
 
     oauth_provider_id = fields.Many2one('auth.oauth.provider', string='OAuth Provider')
     oauth_uid = fields.Char(string='OAuth User ID', help="Oauth Provider user_id", copy=False)
-    oauth_access_token = fields.Char(string='OAuth Access Token', readonly=True, copy=False, prefetch=False)
+    oauth_access_token = fields.Char(string='OAuth Access Token Store', readonly=True, copy=False, prefetch=False, groups=fields.NO_ACCESS)
+    has_oauth_access_token = fields.Boolean(string='Has OAuth Access Token', compute='_compute_has_oauth_access_token', groups='base.group_erp_manager')
 
-    _sql_constraints = [
-        ('uniq_users_oauth_provider_oauth_uid', 'unique(oauth_provider_id, oauth_uid)', 'OAuth UID must be unique per provider'),
-    ]
+    _uniq_users_oauth_provider_oauth_uid = models.Constraint(
+        'unique(oauth_provider_id, oauth_uid)',
+        'OAuth UID must be unique per provider',
+    )
+
+    @property
+    def SELF_READABLE_FIELDS(self):
+        return super().SELF_READABLE_FIELDS + ['has_oauth_access_token']
+
+    @api.depends('oauth_access_token')
+    def _compute_has_oauth_access_token(self):
+        for user in self:
+            user.has_oauth_access_token = bool(user.sudo().oauth_access_token)
+
+    def remove_oauth_access_token(self):
+        user = self.env.user
+        if not (user.has_group('base.group_erp_manager') or self == user):
+            raise AccessError(self.env._('You do not have permissions to remove the access token'))
+        self.sudo().oauth_access_token = False
 
     def _auth_oauth_rpc(self, endpoint, access_token):
         if self.env['ir.config_parameter'].sudo().get_param('auth_oauth.authorization_header'):
@@ -33,9 +53,8 @@ class ResUsers(models.Model):
         if response.ok: # nb: could be a successful failure
             return response.json()
 
-        auth_challenge = werkzeug.http.parse_www_authenticate_header(
-            response.headers.get('WWW-Authenticate'))
-        if auth_challenge.type == 'bearer' and 'error' in auth_challenge:
+        auth_challenge = parse_auth(response.headers.get("WWW-Authenticate"))
+        if auth_challenge and auth_challenge.type == 'bearer' and 'error' in auth_challenge:
             return dict(auth_challenge)
 
         return {'error': 'invalid_request'}
@@ -62,7 +81,7 @@ class ResUsers(models.Model):
             ]
         ]), None)
         if not subject:
-            raise AccessDenied('Missing subject identity')
+            raise AccessDenied(self.env._('Missing subject identity'))
         validation['user_id'] = subject
 
         return validation
@@ -130,16 +149,22 @@ class ResUsers(models.Model):
         # return user credentials
         return (self.env.cr.dbname, login, access_token)
 
-    def _check_credentials(self, password, env):
+    def _check_credentials(self, credential, env):
         try:
-            return super(ResUsers, self)._check_credentials(password, env)
+            return super()._check_credentials(credential, env)
         except AccessDenied:
+            if not (credential['type'] == 'oauth_token' and credential['token']):
+                raise
             passwd_allowed = env['interactive'] or not self.env.user._rpc_api_keys_only()
             if passwd_allowed and self.env.user.active:
-                res = self.sudo().search([('id', '=', self.env.uid), ('oauth_access_token', '=', password)])
+                res = self.sudo().search([('id', '=', self.env.uid), ('oauth_access_token', '=', credential['token'])])
                 if res:
-                    return
+                    return {
+                        'uid': self.env.user.id,
+                        'auth_method': 'oauth',
+                        'mfa': 'default',
+                    }
             raise
 
     def _get_session_token_fields(self):
-        return super(ResUsers, self)._get_session_token_fields() | {'oauth_access_token'}
+        return super()._get_session_token_fields() | {'oauth_access_token'}

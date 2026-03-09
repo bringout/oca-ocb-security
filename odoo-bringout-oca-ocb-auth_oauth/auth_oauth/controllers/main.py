@@ -13,7 +13,7 @@ from werkzeug.exceptions import BadRequest
 from odoo import api, http, SUPERUSER_ID, _
 from odoo.exceptions import AccessDenied
 from odoo.http import request, Response
-from odoo import registry as registry_get
+from odoo.modules.registry import Registry
 from odoo.tools.misc import clean_context
 
 from odoo.addons.auth_signup.controllers.main import AuthSignupHome as Home
@@ -119,7 +119,7 @@ class OAuthLogin(Home):
 
 class OAuthController(http.Controller):
 
-    @http.route('/auth_oauth/signin', type='http', auth='none')
+    @http.route('/auth_oauth/signin', type='http', auth='none', readonly=False)
     @fragment_to_query_string
     def signin(self, **kw):
         state = json.loads(kw['state'])
@@ -142,16 +142,17 @@ class OAuthController(http.Controller):
             action = state.get('a')
             menu = state.get('m')
             redirect = werkzeug.urls.url_unquote_plus(state['r']) if state.get('r') else False
-            url = '/web'
+            url = '/odoo'
             if redirect:
                 url = redirect
             elif action:
-                url = '/web#action=%s' % action
+                url = '/odoo/action-%s' % action
             elif menu:
-                url = '/web#menu_id=%s' % menu
+                url = '/odoo?menu_id=%s' % menu
 
-            pre_uid = request.session.authenticate(dbname, login, key)
-            resp = request.redirect(_get_login_redirect_url(pre_uid, url), 303)
+            credential = {'login': login, 'token': key, 'type': 'oauth_token'}
+            auth_info = request.session.authenticate(request.env, credential)
+            resp = request.redirect(_get_login_redirect_url(auth_info['uid'], url), 303)
             resp.autocorrect_location_header = False
 
             # Since /web is hardcoded, verify user has right to land on it
@@ -175,7 +176,7 @@ class OAuthController(http.Controller):
         redirect.autocorrect_location_header = False
         return redirect
 
-    @http.route('/auth_oauth/oea', type='http', auth='none')
+    @http.route('/auth_oauth/oea', type='http', auth='none', readonly=False)
     def oea(self, **kw):
         """login user via Odoo Account provider"""
         dbname = kw.pop('db', None)
@@ -186,7 +187,7 @@ class OAuthController(http.Controller):
         if not http.db_filter([dbname]):
             raise BadRequest()
 
-        registry = registry_get(dbname)
+        registry = Registry(dbname)
         with registry.cursor() as cr:
             try:
                 env = api.Environment(cr, SUPERUSER_ID, {})

@@ -22,6 +22,7 @@ Allow users to sign up and reset their password
         'views/res_config_settings_views.xml',
         'views/res_users_views.xml',
         'views/auth_signup_login_templates.xml',
+        'views/auth_signup_templates_email.xml',
         'views/webclient_templates.xml',
         ],
     'bootstrap': True,
@@ -30,5 +31,6 @@ Allow users to sign up and reset their password
             'auth_signup/static/**/*',
         ],
     },
+    'author': 'Odoo S.A.',
     'license': 'LGPL-3',
 }

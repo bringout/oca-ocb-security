@@ -1,3 +1,5 @@
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
+
 import json
 import requests
 from unittest.mock import patch, call, MagicMock
@@ -5,7 +7,7 @@ from unittest.mock import patch, call, MagicMock
 from odoo import fields
 from odoo.addons.microsoft_calendar.utils.microsoft_calendar import MicrosoftCalendarService
 from odoo.addons.microsoft_calendar.utils.microsoft_event import MicrosoftEvent
-from odoo.addons.microsoft_account.models.microsoft_service import MicrosoftService
+from odoo.addons.microsoft_account.models.microsoft_service import MicrosoftService, DEFAULT_MICROSOFT_TOKEN_ENDPOINT
 from odoo.tests import TransactionCase
 
 
@@ -28,7 +30,10 @@ class TestMicrosoftService(TransactionCase):
         self.fake_next_sync_token_url = f"https://graph.microsoft.com/v1.0/me/calendarView/delta?$deltatoken={self.fake_next_sync_token}"
 
         self.header_prefer = 'outlook.body-content-type="html", odata.maxpagesize=50'
-        self.header = {'Content-type': 'application/json', 'Authorization': 'Bearer %s' % self.fake_token}
+        self.delete_header = {
+            'Authorization': 'Bearer %s' % self.fake_token,
+        }
+        self.header = {'Content-type': 'application/json', **self.delete_header}
         self.call_with_sync_token = call(
             "/v1.0/me/calendarView/delta",
             {"$deltatoken": self.fake_sync_token},
@@ -365,7 +370,7 @@ class TestMicrosoftService(TransactionCase):
         self.assertFalse(res)
         mock_do_request.assert_called_with(
             f"/v1.0/me/calendar/events/{event_id}",
-            {}, headers={'Authorization': 'Bearer %s' % self.fake_token}, method="DELETE", timeout=DEFAULT_TIMEOUT
+            {}, headers=self.delete_header, method="DELETE", timeout=DEFAULT_TIMEOUT
         )
 
     @patch.object(MicrosoftService, "_do_request")
@@ -384,7 +389,7 @@ class TestMicrosoftService(TransactionCase):
             self.assertTrue(res)
             mock_do_request.assert_called_with(
                 f"/v1.0/me/calendar/events/{event_id}",
-                {}, headers={'Authorization': 'Bearer %s' % self.fake_token}, method="DELETE", timeout=DEFAULT_TIMEOUT
+                {}, headers=self.delete_header, method="DELETE", timeout=DEFAULT_TIMEOUT
             )
 
 
@@ -398,7 +403,7 @@ class TestMicrosoftService(TransactionCase):
         self.assertTrue(res)
         mock_do_request.assert_called_with(
             f"/v1.0/me/calendar/events/{event_id}",
-            {}, headers={'Authorization': 'Bearer %s' % self.fake_token}, method="DELETE", timeout=DEFAULT_TIMEOUT
+            {}, headers=self.delete_header, method="DELETE", timeout=DEFAULT_TIMEOUT
         )
 
     def test_answer_token_error(self):
@@ -461,3 +466,40 @@ class TestMicrosoftService(TransactionCase):
             self.call_with_sync_token,
             self.call_without_sync_token
         ])
+
+    @patch.object(MicrosoftService, "_do_request")
+    def test_refresh_microsoft_calendar_token_uses_correct_endpoint(self, mock_do_request):
+        # Ensure we use the correct endpoint (useful for single/multi-tenant deployments).
+        mock_do_request.return_value = self._do_request_result(
+            {
+                "access_token": "dummy_access_token",
+                "token_type": "Bearer",
+                "expires_in": 3599,
+                "scope": "Mail.Read User.Read",
+                "refresh_token": "dummy_refresh_token",
+            }
+        )
+        IrParameter = self.env["ir.config_parameter"].sudo()
+        IrParameter.set_param("microsoft_calendar_client_id", "dummy_client_id")
+        IrParameter.set_param("microsoft_calendar_client_secret", "dummy_client_secret")
+
+        self.env.user._refresh_microsoft_calendar_token()
+
+        custom_token_endpoint = "https://login.microsoftonline.com/dummy_tenant_id/oauth2/v2.0/token"
+        IrParameter.set_param("microsoft_account.token_endpoint", custom_token_endpoint)
+        self.env.user._refresh_microsoft_calendar_token()
+
+        kwargs = {
+            "params": {
+                "client_id": "dummy_client_id",
+                "client_secret": "dummy_client_secret",
+                "grant_type": "refresh_token",
+                "refresh_token": False,
+            },
+            "headers": {"Content-type": "application/x-www-form-urlencoded"},
+            "method": "POST",
+            "preuri": "",
+        }
+        first_call = call(DEFAULT_MICROSOFT_TOKEN_ENDPOINT, **kwargs)
+        second_call = call(custom_token_endpoint, **kwargs)
+        mock_do_request.assert_has_calls([first_call, second_call])

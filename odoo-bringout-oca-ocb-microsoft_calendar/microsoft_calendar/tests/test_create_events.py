@@ -1,15 +1,22 @@
-from datetime import datetime, timedelta
-from unittest.mock import patch
+# Part of Odoo. See LICENSE file for full copyright and licensing details.
+
+from unittest.mock import patch, call
+from datetime import timedelta, datetime
+from freezegun import freeze_time
 
 from odoo import Command, fields
 
+from odoo.addons.mail.tests.common import mail_new_test_user
 from odoo.addons.microsoft_calendar.utils.microsoft_calendar import MicrosoftCalendarService
 from odoo.addons.microsoft_calendar.utils.microsoft_event import MicrosoftEvent
-from odoo.addons.microsoft_calendar.models.res_users import User
-from odoo.addons.microsoft_calendar.tests.common import TestCommon, mock_get_token
+from odoo.addons.microsoft_calendar.models.res_users import ResUsers
+from odoo.addons.microsoft_calendar.tests.common import TestCommon, mock_get_token, _modified_date_in_the_future
 from odoo.exceptions import ValidationError, UserError
+from odoo.tests.common import tagged
 
-@patch.object(User, '_get_microsoft_calendar_token', mock_get_token)
+
+@tagged('post_install', '-at_install')
+@patch.object(ResUsers, '_get_microsoft_calendar_token', mock_get_token)
 class TestCreateEvents(TestCommon):
 
     @patch.object(MicrosoftCalendarService, 'insert')
@@ -193,7 +200,7 @@ class TestCreateEvents(TestCommon):
         recurrence.invalidate_recordset()
 
         # assert
-        self.assertEqual(recurrence.ms_organizer_event_id, event_id)
+        self.assertEqual(recurrence.microsoft_id, event_id)
         self.assertEqual(recurrence.ms_universal_event_id, event_iCalUId)
         self.assertEqual(recurrence.need_sync_m, False)
 
@@ -239,7 +246,7 @@ class TestCreateEvents(TestCommon):
         # assert
         mock_insert.assert_not_called()
 
-        self.assertEqual(recurrence.ms_organizer_event_id, False)
+        self.assertEqual(recurrence.microsoft_id, False)
         self.assertEqual(recurrence.ms_universal_event_id, False)
         self.assertEqual(recurrence.need_sync_m, False)
 
@@ -307,6 +314,101 @@ class TestCreateEvents(TestCommon):
         # Assert that no insert call was made.
         mock_insert.assert_not_called()
 
+    @patch.object(MicrosoftCalendarService, 'insert')
+    def test_create_event_with_sync_config_paused(self, mock_insert):
+        """
+        Creates an event with the synchronization paused, the event must have its field 'need_sync_m' as True
+        for later synchronizing it with Outlook Calendar.
+        """
+        # Set user sync configuration as active and then pause the synchronization.
+        self.organizer_user.microsoft_synchronization_stopped = False
+        self.organizer_user.pause_microsoft_synchronization()
+
+        # Try to create a simple event in Odoo Calendar.
+        record = self.env["calendar.event"].with_user(self.organizer_user).create(self.simple_event_values)
+        self.call_post_commit_hooks()
+        record.invalidate_recordset()
+
+        # Ensure that synchronization is paused, insert wasn't called and record is waiting to be synced.
+        self.assertFalse(self.organizer_user.microsoft_synchronization_stopped)
+        self.assertEqual(self.organizer_user._get_microsoft_sync_status(), "sync_paused")
+        self.assertTrue(record.need_sync_m, "Sync variable must be true for updating event when sync re-activates")
+        mock_insert.assert_not_called()
+
+    @patch.object(MicrosoftCalendarService, 'get_events')
+    @patch.object(MicrosoftCalendarService, 'insert')
+    def test_sync_create_update_single_event(self, mock_insert, mock_get_events):
+        """
+        If the synchronization with Outlook is stopped, then records (events and recurrences) created or updated
+        should not be synced. They must be synced only when created or updated having the synchronization active.
+        In this test, the synchronization is stopped and an event is created locally. After this, the synchronization
+        is restarted and the event is updated (this way, syncing it with Outlook Calendar).
+        """
+        # Set last synchronization date for allowing synchronizing events created after this date.
+        self.organizer_user._set_ICP_first_synchronization_date(fields.Datetime.now())
+
+        # Stop the synchronization for clearing the last_sync_date.
+        self.organizer_user.with_user(self.organizer_user).sudo().stop_microsoft_synchronization()
+        self.assertEqual(self.organizer_user.microsoft_last_sync_date, False,
+                         "Variable last_sync_date must be False due to sync stop.")
+
+        # Create a not synced event (local).
+        simple_event_values_updated = self.simple_event_values
+        for date_field in ['start', 'stop']:
+            simple_event_values_updated[date_field] = simple_event_values_updated[date_field].replace(year=datetime.now().year)
+        event = self.env["calendar.event"].with_user(self.organizer_user).create(simple_event_values_updated)
+
+        # Assert that insert was not called and prepare mock for the synchronization restart.
+        mock_insert.assert_not_called()
+        mock_get_events.return_value = ([], None)
+
+        ten_minutes_after_creation = event.write_date + timedelta(minutes=10)
+        with freeze_time(ten_minutes_after_creation):
+            # Restart the synchronization with Outlook Calendar.
+            self.organizer_user.with_user(self.organizer_user).sudo().restart_microsoft_synchronization()
+            # Sync microsoft calendar, considering that ten minutes were passed after the event creation.
+            self.organizer_user.with_user(self.organizer_user).sudo()._sync_microsoft_calendar()
+            self.call_post_commit_hooks()
+            event.invalidate_recordset()
+
+            # Assert that insert function was not called and check last_sync_date variable value.
+            mock_insert.assert_not_called()
+
+            self.assertNotEqual(self.organizer_user.microsoft_last_sync_date, False,
+                                "Variable last_sync_date must not be empty after sync.")
+            self.assertLessEqual(event.write_date, self.organizer_user.microsoft_last_sync_date,
+                                "Event creation must happen before last_sync_date")
+
+            # Assert that the local event did not get synced after synchronization restart.
+            self.assertEqual(event.microsoft_id, False,
+                            "Event should not be synchronized while sync is paused.")
+            self.assertEqual(event.ms_universal_event_id, False,
+                            "Event should not be synchronized while sync is paused.")
+
+        # Update local event information.
+        event.write({
+            "name": "New event name"
+        })
+        self.call_post_commit_hooks()
+
+        # Prepare mock for new synchronization.
+        event_id = "123"
+        event_iCalUId = "456"
+        mock_insert.return_value = (event_id, event_iCalUId)
+        mock_get_events.return_value = ([], None)
+
+        # Synchronize local event with Outlook after updating it locally.
+        self.organizer_user.with_user(self.organizer_user).sudo()._sync_microsoft_calendar()
+        self.call_post_commit_hooks()
+        event.invalidate_recordset()
+
+        # Assert that the event got synchronized with Microsoft (through mock).
+        self.assertEqual(event.microsoft_id, "123")
+        self.assertEqual(event.ms_universal_event_id, "456")
+
+        # Assert that the Microsoft Insert was called once.
+        mock_insert.assert_called_once()
+
     @patch.object(MicrosoftCalendarService, 'get_events')
     @patch.object(MicrosoftCalendarService, 'insert')
     def test_create_event_for_another_user(self, mock_insert, mock_get_events):
@@ -357,7 +459,7 @@ class TestCreateEvents(TestCommon):
             'login': 'portal@user',
             'email': 'portal@user',
             'name': 'PortalUser',
-            'groups_id': [Command.set([portal_group.id])],
+            'group_ids': [Command.set([portal_group.id])],
             })
 
         # Mock event from Microsoft and sync event with Odoo through self.attendee_user (synced user).
@@ -396,6 +498,203 @@ class TestCreateEvents(TestCommon):
         new_records = (records - existing_records)
         self.assertEqual(len(new_records), 1)
         self.assert_odoo_event(new_records, expected_event)
+
+    def test_create_event_with_default_and_undefined_sensitivity(self):
+        """ Check if microsoft events are created in Odoo when 'None' sensitivity setting is defined and also when it is not. """
+        # Sync events from Microsoft to Odoo after adding the sensitivity (privacy) property.
+        self.simple_event_from_outlook_organizer.pop('sensitivity')
+        undefined_privacy_event = {'id': 100, 'iCalUId': 2, **self.simple_event_from_outlook_organizer}
+        default_privacy_event = {'id': 200, 'iCalUId': 4, 'sensitivity': None, **self.simple_event_from_outlook_organizer}
+        self.env['calendar.event']._sync_microsoft2odoo(MicrosoftEvent([undefined_privacy_event, default_privacy_event]))
+
+        # Ensure that synced events have the correct privacy field in Odoo.
+        undefined_privacy_odoo_event = self.env['calendar.event'].search([('microsoft_id', '=', 100)])
+        default_privacy_odoo_event = self.env['calendar.event'].search([('microsoft_id', '=', 200)])
+        self.assertFalse(undefined_privacy_odoo_event.privacy, "Event with undefined privacy must have False value in privacy field.")
+        self.assertFalse(default_privacy_odoo_event.privacy, "Event with custom privacy must have False value in privacy field.")
+
+    @patch.object(MicrosoftCalendarService, 'get_events')
+    @patch.object(MicrosoftCalendarService, 'insert')
+    def test_create_videocall_sync_microsoft_calendar(self, mock_insert, mock_get_events):
+        """
+        Test syncing an event from Odoo to Microsoft Calendar.
+        Ensures that meeting details are correctly updated after syncing from Microsoft.
+        """
+        record = self.env["calendar.event"].with_user(self.organizer_user).create(self.simple_event_values)
+        self.assertEqual(record.name, "simple_event", "Event name should be same as simple_event")
+
+        # Mock values to simulate Microsoft event creation
+        event_id = "123"
+        event_iCalUId = "456"
+        mock_insert.return_value = (event_id, event_iCalUId)
+
+        # Prepare the mock event response from Microsoft
+        self.response_from_outlook_organizer = {
+            **self.simple_event_from_outlook_organizer,
+            '_odoo_id': record.id,
+            'onlineMeeting': {
+                'joinUrl': 'https://teams.microsoft.com/l/meetup-join/test',
+                'conferenceId': '275984951',
+                'tollNumber': '+1 323-555-0166',
+            },
+            'lastModifiedDateTime': _modified_date_in_the_future(record),
+            'isOnlineMeeting': True,
+            'onlineMeetingProvider': 'teamsForBusiness',
+        }
+        mock_get_events.return_value = (MicrosoftEvent([self.response_from_outlook_organizer]), None)
+        self.organizer_user.with_user(self.organizer_user).sudo()._sync_microsoft_calendar()
+        self.call_post_commit_hooks()
+        record.invalidate_recordset()
+
+        # Check that Microsoft insert was called exactly once
+        mock_insert.assert_called_once()
+        self.assertEqual(record.microsoft_id, event_id, "The Microsoft ID should be assigned to the event.")
+        self.assertEqual(record.ms_universal_event_id, event_iCalUId)
+        self.assertEqual(mock_insert.call_args[0][0].get('isOnlineMeeting'), True,
+                         "The event should be marked as an online meeting.")
+        self.assertEqual(mock_insert.call_args[0][0].get('onlineMeetingProvider'), 'teamsForBusiness',
+                         "The event's online meeting provider should be set to Microsoft Teams.")
+        self.assertEqual(record.need_sync_m, False)
+
+        # Verify the event's videocall_location is updated in Odoo
+        event = self.env['calendar.event'].search([('name', '=', self.response_from_outlook_organizer.get('subject'))])
+        self.assertTrue(event, "The event should exist in the calendar after sync.")
+        self.assertEqual(event.videocall_location, 'https://teams.microsoft.com/l/meetup-join/test', "The meeting URL should match.")
+
+    @patch.object(MicrosoftCalendarService, 'get_events')
+    @patch.object(MicrosoftCalendarService, 'insert')
+    def test_no_videocall_hr_holidays(self, mock_insert, mock_get_events):
+        """
+        Test HR holidays synchronization with Microsoft Calendar, ensuring no online meetings
+        are generated for leave requests.
+        """
+        # Skip test if HR Holidays module isn't installed
+        if self.env['ir.module.module']._get('hr_holidays').state not in ['installed', 'to upgrade']:
+            self.skipTest("The 'hr_holidays' module must be installed to run this test.")
+
+        self.user_hrmanager = mail_new_test_user(self.env, login='bastien', groups='base.group_user,hr_holidays.group_hr_holidays_manager')
+        self.user_employee = mail_new_test_user(self.env, login='enguerran', password='enguerran', groups='base.group_user')
+        self.rd_dept = self.env['hr.department'].with_context(tracking_disable=True).create({
+            'name': 'Research and Development',
+        })
+        self.employee_emp = self.env['hr.employee'].create({
+            'name': 'Marc Demo',
+            'user_id': self.user_employee.id,
+            'department_id': self.rd_dept.id,
+        })
+        self.hr_leave_type = self.env['hr.leave.type'].with_user(self.user_hrmanager).create({
+            'name': 'Time Off Type',
+            'requires_allocation': False,
+        })
+        self.holiday = self.env['hr.leave'].with_context(mail_create_nolog=True, mail_notrack=True).with_user(self.user_employee).create({
+            'name': 'Time Off Employee',
+            'employee_id': self.employee_emp.id,
+            'holiday_status_id': self.hr_leave_type.id,
+            'request_date_from': datetime(2020, 1, 15),
+            'request_date_to': datetime(2020, 1, 15),
+        })
+        self.holiday.with_user(self.user_hrmanager).action_approve()
+
+        # Ensure the event exists in the calendar and is correctly linked to the time off
+        search_domain = [
+            ('name', 'like', self.holiday.employee_id.name),
+            ('start_date', '>=', self.holiday.request_date_from),
+            ('stop_date', '<=', self.holiday.request_date_to),
+        ]
+        record = self.env['calendar.event'].search(search_domain)
+        self.assertTrue(record, "The time off event should exist.")
+        self.assertEqual(record.name, "Marc Demo on Time Off : 1 days",
+                        "The event name should match the employee's time off description.")
+        self.assertEqual(record.start_date, datetime(2020, 1, 15).date(),
+                        "The start date should match the time off request.")
+        self.assertEqual(record.stop_date, datetime(2020, 1, 15).date(),
+                        "The end date should match the time off request.")
+
+        # Mock Microsoft API response for event creation
+        event_id = "123"
+        event_iCalUId = "456"
+        mock_insert.return_value = (event_id, event_iCalUId)
+        mock_get_events.return_value = ([], None)
+
+        # Sync calendar with Microsoft
+        self.user_employee.with_user(self.user_employee).sudo()._sync_microsoft_calendar()
+        self.call_post_commit_hooks()
+        record.invalidate_recordset()
+        mock_insert.assert_called_once()
+
+        self.assertEqual(record.microsoft_id, event_id, "The Microsoft ID should be assigned correctly.")
+        self.assertEqual(record.ms_universal_event_id, event_iCalUId, "The iCalUID should be assigned correctly.")
+        self.assertEqual(record.need_sync_m, False, "The event should no longer need synchronization.")
+        self.assertEqual(mock_insert.call_args[0][0].get('isOnlineMeeting'), False,
+                        "Time off events should not be marked as an online meeting.")
+        self.assertFalse(mock_insert.call_args[0][0].get('onlineMeetingProvider', False))
+
+    @patch.object(MicrosoftCalendarService, 'insert')
+    def test_skip_sync_for_non_synchronized_users_new_events(self, mock_insert):
+        """
+        Skip the synchro of new events by attendees when the organizer is not synchronized with Outlook.
+        Otherwise, the event ownership will be lost to the attendee and it could generate duplicates in
+        Odoo, as well cause problems in the future the synchronization of that event for the original owner.
+        """
+        with self.mock_datetime_and_now('2021-09-20 10:00:00'):
+            # Ensure that the calendar synchronization of the attendee is active. Deactivate organizer's synchronization.
+            self.attendee_user.microsoft_calendar_token_validity = datetime.now() + timedelta(minutes=60)
+            self.assertTrue(self.env['calendar.event'].with_user(self.attendee_user)._check_microsoft_sync_status())
+            self.organizer_user.microsoft_synchronization_stopped = True
+
+            # Create an event with the organizer not synchronized and invite the synchronized attendee.
+            self.simple_event_values['user_id'] = self.organizer_user.id
+            self.simple_event_values['partner_ids'] = [Command.set([self.organizer_user.partner_id.id, self.attendee_user.partner_id.id])]
+            event = self.env['calendar.event'].with_user(self.organizer_user).create(self.simple_event_values)
+            self.assertTrue(event, "The event for the not synchronized owner must be created in Odoo.")
+
+            # Synchronize the attendee's calendar, then make sure insert was not called.
+            event.with_user(self.attendee_user).sudo()._sync_odoo2microsoft()
+            mock_insert.assert_not_called()
+
+            # Prepare mock return for the insertion.
+            event_id = "123"
+            event_iCalUId = "456"
+            mock_insert.return_value = (event_id, event_iCalUId)
+
+            # Activate the synchronization of the organizer and ensure that the event is now inserted.
+            self.organizer_user.microsoft_synchronization_stopped = False
+            self.organizer_user.microsoft_calendar_token_validity = datetime.now() + timedelta(minutes=60)
+            self.organizer_user.with_user(self.organizer_user).restart_microsoft_synchronization()
+            event.with_user(self.organizer_user).sudo()._sync_odoo2microsoft()
+            self.call_post_commit_hooks()
+            mock_insert.assert_called()
+
+    @patch.object(MicrosoftCalendarService, 'get_events')
+    @patch.object(MicrosoftCalendarService, 'insert')
+    def test_create_duplicate_event_microsoft_calendar(self, mock_insert, mock_get_events):
+        """
+        Test syncing an event from Odoo to Microsoft Calendar.
+        """
+        record = self.env["calendar.event"].with_user(self.organizer_user).create(self.simple_event_values)
+
+        # Mock values to simulate Microsoft event creation
+        event_id = "123"
+        event_iCalUId = "456"
+        mock_insert.return_value = (event_id, event_iCalUId)
+        record2 = record.copy()
+        # Prepare the mock event response from Microsoft
+        self.response_from_outlook_organizer = {
+            **self.simple_event_from_outlook_organizer,
+            '_odoo_id': record.id,
+        }
+        self.response_from_outlook_organizer_1 = {
+            **self.simple_event_from_outlook_organizer,
+            '_odoo_id': record2.id,
+        }
+        mock_get_events.return_value = (MicrosoftEvent([self.response_from_outlook_organizer, self.response_from_outlook_organizer_1]), None)
+        self.organizer_user.with_user(self.organizer_user).sudo()._sync_microsoft_calendar()
+        self.call_post_commit_hooks()
+        record.invalidate_recordset()
+        record2.invalidate_recordset()
+
+        # Check that Microsoft insert was called exactly once
+        mock_insert.assert_called()
 
     @patch.object(MicrosoftCalendarService, 'get_events')
     @patch.object(MicrosoftCalendarService, 'insert')
