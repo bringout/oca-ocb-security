@@ -21,8 +21,6 @@ msgid ""
 ".\n"
 "                <br/>"
 msgstr ""
-".\n"
-"                <br/>"
 
 #. module: auth_totp_mail_enforce
 #: model:mail.template,body_html:auth_totp_mail_enforce.mail_template_totp_mail_code
@@ -117,7 +115,7 @@ msgstr "Svi korisnici"
 # taken from hr.po
 #. module: auth_totp_mail_enforce
 #. odoo-python
-#: code:addons/auth_totp_mail_enforce/models/res_users.py
+#: code:addons/auth_totp_mail_enforce/models/res_users.py:0
 #, python-format
 msgid "Cannot send email: user %s has no email address."
 msgstr "E-mail se ne može poslati: korisnik %s nema e-mail adresu."
@@ -149,7 +147,7 @@ msgstr "Kreirano"
 #. module: auth_totp_mail_enforce
 #: model:ir.model.fields,field_description:auth_totp_mail_enforce.field_auth_totp_rate_limit_log__display_name
 msgid "Display Name"
-msgstr "Naziv"
+msgstr "Naziv za prikaz"
 
 #. module: auth_totp_mail_enforce
 #: model:ir.model.fields.selection,name:auth_totp_mail_enforce.selection__res_config_settings__auth_totp_policy__employee_required
@@ -185,19 +183,19 @@ msgstr "IP"
 #. module: auth_totp_mail_enforce
 #: model:ir.model.fields,field_description:auth_totp_mail_enforce.field_auth_totp_rate_limit_log____last_update
 msgid "Last Modified on"
-msgstr "Zadnja promjena"
+msgstr "Zadnja izmjena"
 
 # taken from hr.po
 #. module: auth_totp_mail_enforce
 #: model:ir.model.fields,field_description:auth_totp_mail_enforce.field_auth_totp_rate_limit_log__write_uid
 msgid "Last Updated by"
-msgstr "Promijenio"
+msgstr "Zadnji ažurirao"
 
 # taken from hr.po
 #. module: auth_totp_mail_enforce
 #: model:ir.model.fields,field_description:auth_totp_mail_enforce.field_auth_totp_rate_limit_log__write_date
 msgid "Last Updated on"
-msgstr "Vrijeme promjene"
+msgstr "Zadnje ažurirano"
 
 # taken from hr.po
 #. module: auth_totp_mail_enforce
@@ -250,7 +248,7 @@ msgstr "Korisnik"
 
 #. module: auth_totp_mail_enforce
 #. odoo-python
-#: code:addons/auth_totp_mail_enforce/models/res_users.py
+#: code:addons/auth_totp_mail_enforce/models/res_users.py:0
 #, python-format
 msgid "Verification failed, please double-check the 6-digit code"
 msgstr "Verifikacija neuspješna, molimo dvaput provjerite 6-ciferni kod"
@@ -266,14 +264,14 @@ msgstr ""
 
 #. module: auth_totp_mail_enforce
 #. odoo-python
-#: code:addons/auth_totp_mail_enforce/models/res_users.py
+#: code:addons/auth_totp_mail_enforce/models/res_users.py:0
 #, python-format
 msgid "You reached the limit of authentication mails sent for your account"
 msgstr "Dostigli ste limit autentifikacijskih e-mailova poslanih za vaš račun"
 
 #. module: auth_totp_mail_enforce
 #. odoo-python
-#: code:addons/auth_totp_mail_enforce/models/res_users.py
+#: code:addons/auth_totp_mail_enforce/models/res_users.py:0
 #, python-format
 msgid "You reached the limit of code verifications for your account"
 msgstr "Dostigli ste limit verifikacija koda za vaš račun"
