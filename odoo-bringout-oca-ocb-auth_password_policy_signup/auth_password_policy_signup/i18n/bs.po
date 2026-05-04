@@ -17,7 +17,7 @@ msgstr ""
 
 #. module: auth_password_policy_signup
 #. odoo-javascript
-#: code:addons/auth_password_policy_signup/static/src/js/password_meter.js
+#: code:addons/auth_password_policy_signup/static/src/js/password_meter.js:0
 #, python-format
 msgid ""
 "Required: %s.\n"
@@ -30,7 +30,22 @@ msgstr ""
 
 #. module: auth_password_policy_signup
 #. odoo-javascript
-#: code:addons/auth_password_policy_signup/static/src/js/password_meter.js
+#: code:addons/auth_password_policy_signup/static/src/js/password_meter.js:0
 #, python-format
 msgid "no requirements"
 msgstr "nema zahtjeva"
+
+#. module: auth_password_policy_signup
+#: model:ir.model.fields,field_description:auth_password_policy_signup.field_ir_http__display_name
+msgid "Display Name"
+msgstr "Naziv za prikaz"
+
+#. module: auth_password_policy_signup
+#: model:ir.model,name:auth_password_policy_signup.model_ir_http
+msgid "HTTP Routing"
+msgstr "HTTP rutiranje"
+
+#. module: auth_password_policy_signup
+#: model:ir.model.fields,field_description:auth_password_policy_signup.field_ir_http__id
+msgid "ID"
+msgstr "ID"

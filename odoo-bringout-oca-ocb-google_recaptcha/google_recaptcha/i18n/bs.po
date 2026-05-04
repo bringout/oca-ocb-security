@@ -54,21 +54,21 @@ msgstr "Minimalni rezultat"
 
 #. module: google_recaptcha
 #. odoo-javascript
-#: code:addons/google_recaptcha/static/src/js/recaptcha.js
+#: code:addons/google_recaptcha/static/src/js/recaptcha.js:0
 #, python-format
 msgid "No recaptcha site key set."
 msgstr "Nije postavljen ključ recaptcha stranice."
 
 #. module: google_recaptcha
 #. odoo-javascript
-#: code:addons/google_recaptcha/static/src/xml/recaptcha.xml
+#: code:addons/google_recaptcha/static/src/xml/recaptcha.xml:0
 #, python-format
 msgid "Privacy Policy"
 msgstr "Pravila privatnosti"
 
 #. module: google_recaptcha
 #. odoo-javascript
-#: code:addons/google_recaptcha/static/src/xml/recaptcha.xml
+#: code:addons/google_recaptcha/static/src/xml/recaptcha.xml:0
 #, python-format
 msgid "Protected by reCAPTCHA,"
 msgstr "Zaštićeno reCAPTCHA-om,"
@@ -85,49 +85,92 @@ msgstr "Ključ stranice"
 
 #. module: google_recaptcha
 #. odoo-javascript
-#: code:addons/google_recaptcha/static/src/xml/recaptcha.xml
+#: code:addons/google_recaptcha/static/src/xml/recaptcha.xml:0
 #, python-format
 msgid "Terms of Service"
 msgstr "Uvjeti korištenja"
 
 #. module: google_recaptcha
 #. odoo-python
-#: code:addons/google_recaptcha/models/ir_http.py
+#: code:addons/google_recaptcha/models/ir_http.py:0
 #, python-format
 msgid "The reCaptcha private key is invalid."
 msgstr "reCaptcha privatni ključ nije važeći."
 
 #. module: google_recaptcha
 #. odoo-python
-#: code:addons/google_recaptcha/models/ir_http.py
+#: code:addons/google_recaptcha/models/ir_http.py:0
 #, python-format
 msgid "The reCaptcha token is invalid."
 msgstr "reCaptcha token nije važeći."
 
 #. module: google_recaptcha
 #. odoo-javascript
-#: code:addons/google_recaptcha/static/src/js/recaptcha.js
+#: code:addons/google_recaptcha/static/src/js/recaptcha.js:0
 #, python-format
 msgid "The recaptcha site key is invalid."
 msgstr "Recaptcha ključ stranice nije važeći."
 
 #. module: google_recaptcha
 #. odoo-python
-#: code:addons/google_recaptcha/models/ir_http.py
+#: code:addons/google_recaptcha/models/ir_http.py:0
 #, python-format
 msgid "The request is invalid or malformed."
 msgstr "Zahtjev nije važeći ili je oštećen."
 
 #. module: google_recaptcha
 #. odoo-python
-#: code:addons/google_recaptcha/models/ir_http.py
+#: code:addons/google_recaptcha/models/ir_http.py:0
 #, python-format
 msgid "Your request has timed out, please retry."
 msgstr "Vaš zahtjev je istekao, molimo pokušajte ponovno."
 
 #. module: google_recaptcha
 #. odoo-javascript
-#: code:addons/google_recaptcha/static/src/xml/recaptcha.xml
+#: code:addons/google_recaptcha/static/src/xml/recaptcha.xml:0
 #, python-format
 msgid "apply."
 msgstr "primijeni."
+
+#. module: google_recaptcha
+#: model_terms:ir.ui.view,arch_db:google_recaptcha.res_config_settings_view_form
+msgid "<i class=\"oi oi-arrow-right\"/> Generate reCAPTCHA v3 keys"
+msgstr "<i class=\"oi oi-arrow-right\"/> Generiši reCAPTCHA v3 ključeve"
+
+#. module: google_recaptcha
+#: model:ir.model.fields,field_description:google_recaptcha.field_ir_http__display_name
+msgid "Display Name"
+msgstr "Naziv za prikaz"
+
+#. module: google_recaptcha
+#: model:ir.model.fields,field_description:google_recaptcha.field_res_config_settings__enable_recaptcha
+msgid "Enable reCAPTCHA"
+msgstr "Omogući reCAPTCHA"
+
+#. module: google_recaptcha
+#: model:ir.model.fields,field_description:google_recaptcha.field_ir_http__id
+msgid "ID"
+msgstr "ID"
+
+#. module: google_recaptcha
+#: model_terms:ir.ui.view,arch_db:google_recaptcha.res_config_settings_view_form
+msgid ""
+"Protect your forms from spam and abuse. If no keys are provided, no checks "
+"will be done."
+msgstr ""
+"Zaštitite vaše forme od spama i zloupotrebe. Ako ključevi nisu navedeni, "
+"neće se vršiti provjere."
+
+#. module: google_recaptcha
+#: code:addons/google_recaptcha/models/ir_http.py:0
+msgid "Suspicious activity detected by google reCAPTCHA."
+msgstr "Google reCAPTCHA detektovala sumnjivu aktivnost."
+
+#. module: google_recaptcha
+#: code:addons/google_recaptcha/static/src/js/recaptcha.js:0
+msgid ""
+"reCAPTCHA disabled or no site key has been configured. Please check your "
+"settings."
+msgstr ""
+"reCAPTCHA je onemogućena ili nije konfigurisan ključ stranice. Molimo "
+"provjerite vaše postavke."

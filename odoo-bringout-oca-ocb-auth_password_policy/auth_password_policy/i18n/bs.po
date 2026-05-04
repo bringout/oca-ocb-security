@@ -39,7 +39,7 @@ msgstr ""
 # taken from hr.po
 #. module: auth_password_policy
 #. odoo-javascript
-#: code:addons/auth_password_policy/static/src/password_field.js
+#: code:addons/auth_password_policy/static/src/password_field.js:0
 #, python-format
 msgid "Password"
 msgstr "Zaporka"
@@ -47,7 +47,7 @@ msgstr "Zaporka"
 # taken from hr.po
 #. module: auth_password_policy
 #. odoo-python
-#: code:addons/auth_password_policy/models/res_users.py
+#: code:addons/auth_password_policy/models/res_users.py:0
 #, python-format
 msgid "Passwords must have at least %d characters, got %d."
 msgstr "Lozinke moraju imati najmanje %d znakova, postavljeno %d."
@@ -55,7 +55,7 @@ msgstr "Lozinke moraju imati najmanje %d znakova, postavljeno %d."
 # taken from hr.po
 #. module: auth_password_policy
 #. odoo-javascript
-#: code:addons/auth_password_policy/static/src/password_meter.js
+#: code:addons/auth_password_policy/static/src/password_meter.js:0
 #, python-format
 msgid ""
 "Required: %s\n"
@@ -75,7 +75,7 @@ msgstr "Korisnik"
 # taken from hr.po
 #. module: auth_password_policy
 #. odoo-javascript
-#: code:addons/auth_password_policy/static/src/password_policy.js
+#: code:addons/auth_password_policy/static/src/password_policy.js:0
 #, python-format
 msgid "at least %s character classes"
 msgstr "najmanje %s grupa znakova"
@@ -83,7 +83,7 @@ msgstr "najmanje %s grupa znakova"
 # taken from hr.po
 #. module: auth_password_policy
 #. odoo-javascript
-#: code:addons/auth_password_policy/static/src/password_policy.js
+#: code:addons/auth_password_policy/static/src/password_policy.js:0
 #, python-format
 msgid "at least %s characters"
 msgstr "najmanje %s znakova"
@@ -91,7 +91,7 @@ msgstr "najmanje %s znakova"
 # taken from hr.po
 #. module: auth_password_policy
 #. odoo-javascript
-#: code:addons/auth_password_policy/static/src/password_policy.js
+#: code:addons/auth_password_policy/static/src/password_policy.js:0
 #, python-format
 msgid "at least %s words"
 msgstr "najmanje %s riječi"
@@ -99,7 +99,41 @@ msgstr "najmanje %s riječi"
 # taken from hr.po
 #. module: auth_password_policy
 #. odoo-javascript
-#: code:addons/auth_password_policy/static/src/password_meter.js
+#: code:addons/auth_password_policy/static/src/password_meter.js:0
 #, python-format
 msgid "no requirements"
 msgstr "nema zahtjeva"
+
+#. module: auth_password_policy
+#: model:ir.model.fields,field_description:auth_password_policy.field_res_config_settings__display_name
+msgid "Display Name"
+msgstr "Naziv za prikaz"
+
+#. module: auth_password_policy
+#: model:ir.model.fields,field_description:auth_password_policy.field_res_config_settings__id
+msgid "ID"
+msgstr "ID"
+
+#. module: auth_password_policy
+#: code:addons/auth_password_policy/static/src/password_meter.js:0
+msgid "Medium"
+msgstr "Srednje"
+
+#. module: auth_password_policy
+#: code:addons/auth_password_policy/static/src/password_meter.js:0
+msgid "Strong"
+msgstr "Jaka"
+
+#. module: auth_password_policy
+#: code:addons/auth_password_policy/static/src/password_meter.js:0
+msgid "Weak"
+msgstr "Slaba"
+
+#. module: auth_password_policy
+#: code:addons/auth_password_policy/models/res_users.py:0
+msgid ""
+"Your password must contain at least %(minimal_length)d characters and only "
+"has %(current_count)d."
+msgstr ""
+"Vaša lozinka mora sadržavati najmanje %(minimal_length)d karaktera, a sadrži"
+" samo %(current_count)d."

@@ -30,7 +30,7 @@ msgstr "<i class=\"fa fa-fw fa-arrow-right\"/>Upute"
 # taken from hr.po
 #. module: auth_oauth
 #. odoo-python
-#: code:addons/auth_oauth/controllers/main.py
+#: code:addons/auth_oauth/controllers/main.py:0
 #, python-format
 msgid "Access Denied"
 msgstr "Pristup Odbijen"
@@ -103,7 +103,7 @@ msgstr "Krajnja tačka za podatke"
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__display_name
 msgid "Display Name"
-msgstr "Prikazani naziv"
+msgstr "Naziv za prikaz"
 
 # taken from hr.po
 #. module: auth_oauth
@@ -126,7 +126,7 @@ msgstr "ID"
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider____last_update
 msgid "Last Modified on"
-msgstr "Zadnje mijenjano"
+msgstr "Zadnja izmjena"
 
 # taken from hr.po
 #. module: auth_oauth
@@ -209,7 +209,7 @@ msgstr "OAuth2 pružatelj"
 #. module: auth_oauth
 #: model_terms:ir.ui.view,arch_db:auth_oauth.view_users_form
 msgid "Oauth"
-msgstr "Oauth"
+msgstr ""
 
 # taken from hr.po
 #. module: auth_oauth
@@ -239,7 +239,7 @@ msgstr "Opseg"
 #. module: auth_oauth
 #: model:ir.model.fields,field_description:auth_oauth.field_auth_oauth_provider__sequence
 msgid "Sequence"
-msgstr "Sekvenca"
+msgstr "Redoslijed"
 
 # taken from hr.po
 #. module: auth_oauth
@@ -250,7 +250,7 @@ msgstr "ULI Poslužitelja"
 # taken from hr.po
 #. module: auth_oauth
 #. odoo-python
-#: code:addons/auth_oauth/controllers/main.py
+#: code:addons/auth_oauth/controllers/main.py:0
 #, python-format
 msgid "Sign up is not allowed on this database."
 msgstr "Prijava nije dozvoljena na ovoj bazi."
@@ -275,7 +275,7 @@ msgstr "URL korisničkih informacija"
 # taken from hr.po
 #. module: auth_oauth
 #. odoo-python
-#: code:addons/auth_oauth/controllers/main.py
+#: code:addons/auth_oauth/controllers/main.py:0
 #, python-format
 msgid ""
 "You do not have access to this database or your invitation has expired. "
@@ -296,3 +296,43 @@ msgstr "arhitektura"
 #: model_terms:ir.ui.view,arch_db:auth_oauth.res_config_settings_view_form
 msgid "e.g. 1234-xyz.apps.googleusercontent.com"
 msgstr "npr. 1234-xyz.apps.googleusercontent.com"
+
+#. module: auth_oauth
+#: model:ir.model.fields,field_description:auth_oauth.field_res_users__has_oauth_access_token
+msgid "Has OAuth Access Token"
+msgstr "Ima OAuth Access Token"
+
+#. module: auth_oauth
+#: code:addons/auth_oauth/models/res_users.py:0
+msgid "Missing subject identity"
+msgstr "Nedostaje identitet subjekta"
+
+#. module: auth_oauth
+#: model:ir.model.fields,field_description:auth_oauth.field_res_users__oauth_access_token
+msgid "OAuth Access Token Store"
+msgstr "Spremište OAuth Access Tokena"
+
+#. module: auth_oauth
+#: model:auth.oauth.provider,body:auth_oauth.provider_facebook
+msgid "Sign in with Facebook"
+msgstr "Prijavite se sa Facebook"
+
+#. module: auth_oauth
+#: model:auth.oauth.provider,body:auth_oauth.provider_google
+msgid "Sign in with Google"
+msgstr "Prijavite se sa Google"
+
+#. module: auth_oauth
+#: model:auth.oauth.provider,body:auth_oauth.provider_openerp
+msgid "Sign in with Odoo.com"
+msgstr "Prijavite se sa Odoo.com"
+
+#. module: auth_oauth
+#: model_terms:ir.ui.view,arch_db:auth_oauth.res_config_settings_view_form
+msgid "Tutorial"
+msgstr "Uputstvo"
+
+#. module: auth_oauth
+#: code:addons/auth_oauth/models/res_users.py:0
+msgid "You do not have permissions to remove the access token"
+msgstr "Nemate dozvole za uklanjanje access tokena"

@@ -17,7 +17,7 @@ msgstr ""
 
 #. module: auth_totp
 #. odoo-python
-#: code:addons/auth_totp/controllers/home.py
+#: code:addons/auth_totp/controllers/home.py:0
 #, python-format
 msgid "%(browser)s on %(platform)s"
 msgstr "%(browser)s na %(platform)s"
@@ -29,7 +29,7 @@ msgstr "2-faktor setup čarobnjak"
 
 #. module: auth_totp
 #. odoo-python
-#: code:addons/auth_totp/wizard/auth_totp_wizard.py
+#: code:addons/auth_totp/wizard/auth_totp_wizard.py:0
 #, python-format
 msgid "2-Factor authentication is now enabled."
 msgstr "Dvofaktorska autentifikacija je sada omogućena."
@@ -150,7 +150,7 @@ msgstr "Podešavanje autentifikatorske aplikacije"
 #. module: auth_totp
 #: model_terms:ir.ui.view,arch_db:auth_totp.auth_totp_form
 msgid "Cancel"
-msgstr "Odustani"
+msgstr "Otkaži"
 
 #. module: auth_totp
 #: model_terms:ir.ui.view,arch_db:auth_totp.view_totp_wizard
@@ -164,13 +164,13 @@ msgstr "Kliknite na ovaj link da otvorite svoju autentifikatorsku aplikaciju"
 
 # taken from hr.po
 #. module: auth_totp
-#: model:ir.model.fields,field_description:auth_totp.field_auth_totp_wizard__create_uid
+#: model:ir.model.fields,field_description:auth_totp.field_auth_totp_rate_limit_log__create_uid
 msgid "Created by"
 msgstr "Kreirao"
 
 # taken from hr.po
 #. module: auth_totp
-#: model:ir.model.fields,field_description:auth_totp.field_auth_totp_wizard__create_date
+#: model:ir.model.fields,field_description:auth_totp.field_auth_totp_rate_limit_log__create_date
 msgid "Created on"
 msgstr "Kreirano"
 
@@ -206,7 +206,7 @@ msgstr "Onemogući dvofaktorsku autentifikaciju"
 #. module: auth_totp
 #: model:ir.model.fields,field_description:auth_totp.field_auth_totp_device__display_name
 msgid "Display Name"
-msgstr "Naziv"
+msgstr "Naziv za prikaz"
 
 #. module: auth_totp
 #: model_terms:ir.ui.view,arch_db:auth_totp.auth_totp_form
@@ -236,7 +236,7 @@ msgstr "ID"
 
 #. module: auth_totp
 #. odoo-python
-#: code:addons/auth_totp/controllers/home.py
+#: code:addons/auth_totp/controllers/home.py:0
 #, python-format
 msgid "Invalid authentication code format."
 msgstr "Nevažeći format koda za autentifikaciju."
@@ -245,19 +245,19 @@ msgstr "Nevažeći format koda za autentifikaciju."
 #. module: auth_totp
 #: model:ir.model.fields,field_description:auth_totp.field_auth_totp_device____last_update
 msgid "Last Modified on"
-msgstr "Zadnja promjena"
+msgstr "Zadnja izmjena"
 
 # taken from hr.po
 #. module: auth_totp
-#: model:ir.model.fields,field_description:auth_totp.field_auth_totp_wizard__write_uid
+#: model:ir.model.fields,field_description:auth_totp.field_auth_totp_rate_limit_log__write_uid
 msgid "Last Updated by"
-msgstr "Promijenio"
+msgstr "Zadnji ažurirao"
 
 # taken from hr.po
 #. module: auth_totp
-#: model:ir.model.fields,field_description:auth_totp.field_auth_totp_wizard__write_date
+#: model:ir.model.fields,field_description:auth_totp.field_auth_totp_rate_limit_log__write_date
 msgid "Last Updated on"
-msgstr "Vrijeme promjene"
+msgstr "Zadnje ažurirano"
 
 # taken from hr.po
 #. module: auth_totp
@@ -317,7 +317,7 @@ msgstr "Tajna"
 
 #. module: auth_totp
 #. odoo-python
-#: code:addons/auth_totp/wizard/auth_totp_wizard.py
+#: code:addons/auth_totp/wizard/auth_totp_wizard.py:0
 #, python-format
 msgid "The verification code should only contain numbers"
 msgstr "Verifikacijski kod treba sadržavati samo brojeve"
@@ -343,7 +343,7 @@ msgstr "Pouzdani uređaji"
 
 #. module: auth_totp
 #. odoo-python
-#: code:addons/auth_totp/models/res_users.py
+#: code:addons/auth_totp/models/res_users.py:0
 #, python-format
 msgid "Two-Factor Authentication Activation"
 msgstr "Aktivacija dvofaktorske autentifikacije"
@@ -395,21 +395,21 @@ msgstr "Dvofaktorska autentifikacija omogućena"
 
 #. module: auth_totp
 #. odoo-python
-#: code:addons/auth_totp/models/res_users.py
+#: code:addons/auth_totp/models/res_users.py:0
 #, python-format
 msgid "Two-factor authentication already enabled"
 msgstr "Dvofaktorska autentifikacija već omogućena"
 
 #. module: auth_totp
 #. odoo-python
-#: code:addons/auth_totp/models/res_users.py
+#: code:addons/auth_totp/models/res_users.py:0
 #, python-format
 msgid "Two-factor authentication can only be enabled for yourself"
 msgstr "Dvofaktorska autentifikacija se može omogućiti samo za vas"
 
 #. module: auth_totp
 #. odoo-python
-#: code:addons/auth_totp/models/res_users.py
+#: code:addons/auth_totp/models/res_users.py:0
 #, python-format
 msgid "Two-factor authentication disabled for the following user(s): %s"
 msgstr "Dvofaktorska autentifikacija onemogućena za sljedeće korisnik(e): %s"
@@ -432,7 +432,7 @@ msgstr "Verifikacijski kod"
 
 #. module: auth_totp
 #. odoo-python
-#: code:addons/auth_totp/models/res_users.py
+#: code:addons/auth_totp/models/res_users.py:0
 #, python-format
 msgid "Verification failed, please double-check the 6-digit code"
 msgstr "Verifikacija neuspješna, molimo dvaput provjerite 6-ciferni kod"
@@ -441,3 +441,133 @@ msgstr "Verifikacija neuspješna, molimo dvaput provjerite 6-ciferni kod"
 #: model_terms:ir.ui.view,arch_db:auth_totp.auth_totp_form
 msgid "e.g. 123456"
 msgstr "npr. 123456"
+
+#. module: auth_totp
+#: model_terms:ir.ui.view,arch_db:auth_totp.view_totp_field
+msgid ""
+"<i class=\"fa fa-check text-success\"/>\n"
+"                        <span class=\"fw-bold ms-1 me-2\">\n"
+"                            Enabled\n"
+"                        </span>"
+msgstr ""
+"<i class=\"fa fa-check text-success\"/>\n"
+"                        <span class=\"fw-bold ms-1 me-2\">\n"
+"                            Omogućeno\n"
+"                        </span>"
+
+#. module: auth_totp
+#: model_terms:ir.ui.view,arch_db:auth_totp.view_totp_form
+msgid ""
+"<i class=\"fa fa-remove text-danger\"/>\n"
+"                        <span class=\"fw-bold ms-1\">\n"
+"                            Disabled\n"
+"                        </span>"
+msgstr ""
+"<i class=\"fa fa-remove text-danger\"/>\n"
+"                        <span class=\"fw-bold ms-1\">\n"
+"                            Onemogućeno\n"
+"                        </span>"
+
+#. module: auth_totp
+#: model_terms:ir.ui.view,arch_db:auth_totp.view_totp_field
+msgid ""
+"<span class=\"text-muted\">\n"
+"                            Recommended for extra security.\n"
+"                        </span>"
+msgstr ""
+"<span class=\"text-muted\">\n"
+"                            Preporučeno za dodatnu sigurnost.\n"
+"                        </span>"
+
+#. module: auth_totp
+#: model_terms:ir.ui.view,arch_db:auth_totp.view_totp_wizard
+msgid "Add this key in your Authenticator app"
+msgstr "Dodajte ovaj ključ u vašu Authenticator aplikaciju"
+
+#. module: auth_totp
+#: model:ir.model.fields.selection,name:auth_totp.selection__auth_totp_rate_limit_log__limit_type__code_check
+msgid "Code Checking"
+msgstr "Provjera koda"
+
+#. module: auth_totp
+#: model_terms:ir.ui.view,arch_db:auth_totp.view_totp_field
+msgid "Disable"
+msgstr "Onemogući"
+
+#. module: auth_totp
+#: model_terms:ir.ui.view,arch_db:auth_totp.view_totp_wizard
+msgid "Discard"
+msgstr "Odbaci"
+
+#. module: auth_totp
+#: model_terms:ir.ui.view,arch_db:auth_totp.view_totp_wizard
+msgid "Enable Two-Factor Authentication"
+msgstr "Omogući dvofaktorsku autentikaciju"
+
+#. module: auth_totp
+#: model:ir.model.fields,field_description:auth_totp.field_auth_totp_device__expiration_date
+msgid "Expiration Date"
+msgstr "Datum isteka"
+
+#. module: auth_totp
+#: model:ir.model.fields,field_description:auth_totp.field_auth_totp_rate_limit_log__ip
+msgid "Ip"
+msgstr "IP"
+
+#. module: auth_totp
+#: model:ir.model.fields,field_description:auth_totp.field_auth_totp_rate_limit_log__limit_type
+msgid "Limit Type"
+msgstr "Tip ograničenja"
+
+#. module: auth_totp
+#: model_terms:ir.ui.view,arch_db:auth_totp.view_totp_wizard
+msgid "Scan this barcode in your Authenticator app"
+msgstr "Skenirajte ovaj barkod u vašoj Authenticator aplikaciji"
+
+#. module: auth_totp
+#: model:ir.model.fields.selection,name:auth_totp.selection__auth_totp_rate_limit_log__limit_type__send_email
+msgid "Send Email"
+msgstr "Pošalji e-poštu"
+
+#. module: auth_totp
+#: model:ir.model,name:auth_totp.model_auth_totp_rate_limit_log
+msgid "TOTP rate limit logs"
+msgstr "Logovi TOTP ograničenja brzine"
+
+#. module: auth_totp
+#: model:ir.model.fields,field_description:auth_totp.field_res_users__totp_last_counter
+msgid "Totp Last Counter"
+msgstr "TOTP zadnji brojač"
+
+#. module: auth_totp
+#: model_terms:ir.ui.view,arch_db:auth_totp.view_totp_wizard
+msgid "Verification code"
+msgstr "Verifikacijski kod"
+
+#. module: auth_totp
+#: code:addons/auth_totp/models/res_users.py:0
+msgid "Verification failed, please use the latest 6-digit code"
+msgstr "Verifikacija neuspjela, molimo koristite zadnji 6-cifreni kod"
+
+#. module: auth_totp
+#: model_terms:ir.ui.view,arch_db:auth_totp.view_totp_wizard
+msgid "Write the code given by your app"
+msgstr "Upišite kod koji je dala vaša aplikacija"
+
+#. module: auth_totp
+#: code:addons/auth_totp/models/res_users.py:0
+msgid ""
+"You reached the limit of authentication mails sent for your account, please "
+"try again later."
+msgstr ""
+"Dostigli ste ograničenje broja autentikacijskih emailova za vaš nalog, "
+"molimo pokušajte kasnije."
+
+#. module: auth_totp
+#: code:addons/auth_totp/models/res_users.py:0
+msgid ""
+"You reached the limit of code verifications for your account, please try "
+"again later."
+msgstr ""
+"Dostigli ste ograničenje broja verifikacija koda za vaš nalog, molimo "
+"pokušajte kasnije."

@@ -53,7 +53,7 @@ msgstr ""
 
 #. module: microsoft_outlook
 #. odoo-python
-#: code:addons/microsoft_outlook/models/microsoft_outlook_mixin.py
+#: code:addons/microsoft_outlook/models/microsoft_outlook_mixin.py:0
 #, python-format
 msgid "An error occurred when fetching the access token. %s"
 msgstr "Došlo je do greške prilikom preuzimanja pristupnog tokena. %s"
@@ -77,7 +77,7 @@ msgstr "Postavke"
 
 #. module: microsoft_outlook
 #. odoo-python
-#: code:addons/microsoft_outlook/models/ir_mail_server.py
+#: code:addons/microsoft_outlook/models/ir_mail_server.py:0
 #, python-format
 msgid ""
 "Connect your Outlook account with the OAuth Authentication process.  \n"
@@ -88,7 +88,7 @@ msgstr ""
 
 #. module: microsoft_outlook
 #. odoo-python
-#: code:addons/microsoft_outlook/models/fetchmail_server.py
+#: code:addons/microsoft_outlook/models/fetchmail_server.py:0
 #, python-format
 msgid ""
 "Connect your personal Outlook account using OAuth. \n"
@@ -103,7 +103,7 @@ msgid "Go back to your mail server"
 msgstr "Vratite se na svoj mail server"
 
 #. module: microsoft_outlook
-#: model_terms:ir.ui.view,arch_db:microsoft_outlook.res_config_settings_view_form
+#: model:ir.model.fields,field_description:microsoft_outlook.field_fetchmail_server__id
 msgid "ID"
 msgstr "ID"
 
@@ -120,7 +120,7 @@ msgstr "Poslužitelj dolaznih poruka"
 
 #. module: microsoft_outlook
 #. odoo-python
-#: code:addons/microsoft_outlook/models/ir_mail_server.py
+#: code:addons/microsoft_outlook/models/ir_mail_server.py:0
 #, python-format
 msgid ""
 "Incorrect Connection Security for Outlook mail server %r. Please set it to "
@@ -142,11 +142,11 @@ msgstr "Mail server"
 #. module: microsoft_outlook
 #: model:ir.model,name:microsoft_outlook.model_microsoft_outlook_mixin
 msgid "Microsoft Outlook Mixin"
-msgstr "Microsoft Outlook Mixin"
+msgstr ""
 
 #. module: microsoft_outlook
 #. odoo-python
-#: code:addons/microsoft_outlook/models/microsoft_outlook_mixin.py
+#: code:addons/microsoft_outlook/models/microsoft_outlook_mixin.py:0
 #, python-format
 msgid "Only the administrator can link an Outlook mail server."
 msgstr "Samo administrator može povezati Outlook mail server."
@@ -183,21 +183,21 @@ msgstr "Outlook token za osvježavanje"
 
 #. module: microsoft_outlook
 #. odoo-python
-#: code:addons/microsoft_outlook/models/microsoft_outlook_mixin.py
+#: code:addons/microsoft_outlook/models/microsoft_outlook_mixin.py:0
 #, python-format
 msgid "Please configure your Outlook credentials."
 msgstr "Molimo konfigurišite svoje Outlook vjerodajnice."
 
 #. module: microsoft_outlook
 #. odoo-python
-#: code:addons/microsoft_outlook/models/microsoft_outlook_mixin.py
+#: code:addons/microsoft_outlook/models/microsoft_outlook_mixin.py:0
 #, python-format
 msgid "Please connect with your Outlook account before using it."
 msgstr "Molimo povežite se sa svojim Outlook računom prije upotrebe."
 
 #. module: microsoft_outlook
 #. odoo-python
-#: code:addons/microsoft_outlook/models/ir_mail_server.py
+#: code:addons/microsoft_outlook/models/ir_mail_server.py:0
 #, python-format
 msgid ""
 "Please fill the \"Username\" field with your Outlook/Office365 username "
@@ -210,7 +210,7 @@ msgstr ""
 
 #. module: microsoft_outlook
 #. odoo-python
-#: code:addons/microsoft_outlook/models/ir_mail_server.py
+#: code:addons/microsoft_outlook/models/ir_mail_server.py:0
 #, python-format
 msgid ""
 "Please leave the password field empty for Outlook mail server %r. The OAuth "
@@ -227,7 +227,7 @@ msgstr "Pročitaj više"
 
 #. module: microsoft_outlook
 #. odoo-python
-#: code:addons/microsoft_outlook/models/fetchmail_server.py
+#: code:addons/microsoft_outlook/models/fetchmail_server.py:0
 #, python-format
 msgid "SSL is required for the server %r."
 msgstr "SSL je potreban za server %r."
@@ -264,7 +264,110 @@ msgstr "URL za generiranje autorizacijskog koda iz Outlooka"
 
 #. module: microsoft_outlook
 #. odoo-python
-#: code:addons/microsoft_outlook/models/microsoft_outlook_mixin.py
+#: code:addons/microsoft_outlook/models/microsoft_outlook_mixin.py:0
 #, python-format
 msgid "Unknown error."
 msgstr "Nepoznata greška."
+
+#. module: microsoft_outlook
+#: model_terms:ir.ui.view,arch_db:microsoft_outlook.fetchmail_server_view_form
+msgid ""
+"<i class=\"oi oi-arrow-right\"/>\n"
+"                        Connect your Outlook account"
+msgstr ""
+"<i class=\"oi oi-arrow-right\"/>\n"
+"                        Povežite vaš Outlook nalog"
+
+#. module: microsoft_outlook
+#: model_terms:ir.ui.view,arch_db:microsoft_outlook.fetchmail_server_view_form
+msgid ""
+"<span invisible=\"server_type != 'outlook' or not microsoft_outlook_refresh_token\" class=\"badge text-bg-success\">\n"
+"                        Outlook Token Valid\n"
+"                    </span>"
+msgstr ""
+"<span invisible=\"server_type != 'outlook' or not microsoft_outlook_refresh_token\" class=\"badge text-bg-success\">\n"
+"                        Outlook token važeći\n"
+"                    </span>"
+
+#. module: microsoft_outlook
+#: model_terms:ir.ui.view,arch_db:microsoft_outlook.ir_mail_server_view_form
+msgid ""
+"<span invisible=\"smtp_authentication != 'outlook' or not microsoft_outlook_refresh_token\" class=\"badge text-bg-success\">\n"
+"                        Outlook Token Valid\n"
+"                    </span>"
+msgstr ""
+"<span invisible=\"smtp_authentication != 'outlook' or not microsoft_outlook_refresh_token\" class=\"badge text-bg-success\">\n"
+"                        Outlook token važeći\n"
+"                    </span>"
+
+#. module: microsoft_outlook
+#: model:ir.model.fields,field_description:microsoft_outlook.field_fetchmail_server__active
+msgid "Active"
+msgstr "Aktivno"
+
+#. module: microsoft_outlook
+#: model:ir.model.fields,field_description:microsoft_outlook.field_fetchmail_server__display_name
+msgid "Display Name"
+msgstr "Naziv za prikaz"
+
+#. module: microsoft_outlook
+#: model_terms:ir.ui.view,arch_db:microsoft_outlook.microsoft_outlook_oauth_error
+msgid "Go back"
+msgstr "Nazad"
+
+#. module: microsoft_outlook
+#: code:addons/microsoft_outlook/models/ir_mail_server.py:0
+msgid ""
+"Incorrect Connection Security for Outlook mail server “%s”. Please set it to"
+" \"TLS (STARTTLS)\"."
+msgstr ""
+"Neispravna sigurnost konekcije za Outlook mail server “%s”. Molimo postavite"
+" na \"TLS (STARTTLS)\"."
+
+#. module: microsoft_outlook
+#: code:addons/microsoft_outlook/models/microsoft_outlook_mixin.py:0
+msgid "Oops, we could not authenticate you. Please try again later."
+msgstr "Ups, nismo vas mogli autentikovati. Molimo pokušajte ponovo kasnije."
+
+#. module: microsoft_outlook
+#: code:addons/microsoft_outlook/controllers/main.py:0
+msgid ""
+"Oops, you're creating an authorization to send from %(email_login)s but your"
+" address is %(email_server)s. Make sure your addresses match!"
+msgstr ""
+"Ups, kreirate autorizaciju za slanje sa %(email_login)s ali vaša adresa je "
+"%(email_server)s. Provjerite da li se adrese poklapaju!"
+
+#. module: microsoft_outlook
+#: model:ir.model.fields,field_description:microsoft_outlook.field_res_users__outgoing_mail_server_type
+msgid "Outgoing Mail Server Type"
+msgstr "Tip odlaznog mail servera"
+
+#. module: microsoft_outlook
+#: model:ir.model.fields.selection,name:microsoft_outlook.selection__res_users__outgoing_mail_server_type__outlook
+msgid "Outlook"
+msgstr "Outlook"
+
+#. module: microsoft_outlook
+#: code:addons/microsoft_outlook/models/microsoft_outlook_mixin.py:0
+msgid "Please enter a valid email address."
+msgstr "Unesite ispravnu email adresu."
+
+#. module: microsoft_outlook
+#: code:addons/microsoft_outlook/models/ir_mail_server.py:0
+msgid ""
+"Please leave the password field empty for Outlook mail server “%s”. The "
+"OAuth process does not require it"
+msgstr ""
+"Molimo ostavite polje lozinke prazno za Outlook mail server “%s”. OAuth "
+"proces to ne zahtijeva"
+
+#. module: microsoft_outlook
+#: code:addons/microsoft_outlook/models/fetchmail_server.py:0
+msgid "SSL is required for server “%s”."
+msgstr "SSL je obavezan za server “%s”."
+
+#. module: microsoft_outlook
+#: model:ir.model,name:microsoft_outlook.model_res_users
+msgid "User"
+msgstr "Korisnik"
