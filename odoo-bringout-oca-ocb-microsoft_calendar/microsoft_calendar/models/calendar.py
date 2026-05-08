@@ -1,9 +1,10 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 import logging
-import pytz
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, UTC
+from zoneinfo import ZoneInfo
+
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
 
@@ -39,6 +40,23 @@ class CalendarEvent(models.Model):
     _inherit = ['calendar.event', 'microsoft.calendar.sync']
 
     microsoft_recurrence_master_id = fields.Char('Microsoft Recurrence Master Id')
+    microsoft_sync_active = fields.Boolean('Microsoft Sync Active', compute='_compute_microsoft_sync_active')
+
+    @api.depends('user_id.microsoft_calendar_rtoken', 'user_id.microsoft_synchronization_stopped')
+    def _compute_microsoft_sync_active(self):
+        # Check token and sync status manually to avoid calling
+        # _check_microsoft_sync_status, which may trigger a token refresh
+        for event in self:
+            sync_active = (
+                bool(event.user_id.sudo().microsoft_calendar_rtoken)
+                and not event.user_id.sudo().microsoft_synchronization_stopped
+            )
+            event.microsoft_sync_active = sync_active
+
+    @api.depends('microsoft_sync_active', 'recurrency')
+    def _compute_user_can_edit(self):
+        super()._compute_user_can_edit()
+        self.filtered(lambda e: e.microsoft_sync_active and e.recurrency).user_can_edit = False
 
     def _get_organizer(self):
         return self.user_id
@@ -120,11 +138,13 @@ class CalendarEvent(models.Model):
         the day of the following occurrence.
         For example: E1 E2 E3 E4 cannot becomes E1 E3 E2 E4
         """
+        if isinstance(new_start, str):
+            new_start = parse(new_start)
         before_count = len(self.recurrence_id.calendar_event_ids.filtered(
             lambda e: e.start.date() < self.start.date() and e != self
         ))
         after_count = len(self.recurrence_id.calendar_event_ids.filtered(
-            lambda e: e.start.date() < parse(new_start).date() and e != self
+            lambda e: e.start.date() < new_start.date() and e != self
         ))
         if before_count != after_count:
             raise UserError(_(
@@ -286,14 +306,14 @@ class CalendarEvent(models.Model):
     def _get_microsoft_sync_domain(self):
         # in case of full sync, limit to a range of 1y in past and 1y in the future by default
         ICP = self.env['ir.config_parameter'].sudo()
-        day_range = int(ICP.get_param('microsoft_calendar.sync.range_days', default=365))
+        day_range = ICP.get_int('microsoft_calendar.sync.range_days') or 365
         lower_bound = fields.Datetime.subtract(fields.Datetime.now(), days=day_range)
         upper_bound = fields.Datetime.add(fields.Datetime.now(), days=day_range)
 
         # Define 'custom_lower_bound_range' param for limiting old events updates in Odoo and avoid spam on Microsoft.
-        custom_lower_bound_range = ICP.get_param('microsoft_calendar.sync.lower_bound_range')
+        custom_lower_bound_range = ICP.get_int('microsoft_calendar.sync.lower_bound_range')
         if custom_lower_bound_range:
-            lower_bound = fields.Datetime.subtract(fields.Datetime.now(), days=int(custom_lower_bound_range))
+            lower_bound = fields.Datetime.subtract(fields.Datetime.now(), days=custom_lower_bound_range)
         domain = Domain([
             ('partner_ids.user_ids', 'in', [self.env.user.id]),
             ('stop', '>', lower_bound),
@@ -302,7 +322,7 @@ class CalendarEvent(models.Model):
         ])
 
         # Synchronize events that were created after the first synchronization date, when applicable.
-        first_synchronization_date = ICP.get_param('microsoft_calendar.sync.first_synchronization_date')
+        first_synchronization_date = ICP.get_str('microsoft_calendar.sync.first_synchronization_date')
         if first_synchronization_date:
             domain &= Domain('create_date', '>=', first_synchronization_date)
 
@@ -321,8 +341,8 @@ class CalendarEvent(models.Model):
         }
 
         commands_attendee, commands_partner = self._odoo_attendee_commands_m(microsoft_event)
-        timeZone_start = pytz.timezone(microsoft_event.start.get('timeZone'))
-        timeZone_stop = pytz.timezone(microsoft_event.end.get('timeZone'))
+        timeZone_start = ZoneInfo(microsoft_event.start.get('timeZone'))
+        timeZone_stop = ZoneInfo(microsoft_event.end.get('timeZone'))
         start = parse(microsoft_event.start.get('dateTime')).astimezone(timeZone_start).replace(tzinfo=None)
         if microsoft_event.isAllDay:
             stop = parse(microsoft_event.end.get('dateTime')).astimezone(timeZone_stop).replace(tzinfo=None) - relativedelta(days=1)
@@ -377,8 +397,8 @@ class CalendarEvent(models.Model):
 
     @api.model
     def _microsoft_to_odoo_recurrence_values(self, microsoft_event, default_values=None):
-        timeZone_start = pytz.timezone(microsoft_event.start.get('timeZone'))
-        timeZone_stop = pytz.timezone(microsoft_event.end.get('timeZone'))
+        timeZone_start = ZoneInfo(microsoft_event.start.get('timeZone'))
+        timeZone_stop = ZoneInfo(microsoft_event.end.get('timeZone'))
         start = parse(microsoft_event.start.get('dateTime')).astimezone(timeZone_start).replace(tzinfo=None)
         if microsoft_event.isAllDay:
             stop = parse(microsoft_event.end.get('dateTime')).astimezone(timeZone_stop).replace(tzinfo=None) - relativedelta(days=1)
@@ -508,8 +528,6 @@ class CalendarEvent(models.Model):
         if not fields_to_sync:
             return values
 
-        microsoft_guid = self.env['ir.config_parameter'].sudo().get_param('microsoft_calendar.microsoft_guid', False)
-
         if self.microsoft_recurrence_master_id and 'type' not in values:
             values['seriesMasterId'] = self.microsoft_recurrence_master_id
             values['type'] = 'exception'
@@ -528,8 +546,8 @@ class CalendarEvent(models.Model):
                 start = {'dateTime': self.start_date.isoformat(), 'timeZone': 'Europe/London'}
                 end = {'dateTime': (self.stop_date + relativedelta(days=1)).isoformat(), 'timeZone': 'Europe/London'}
             else:
-                start = {'dateTime': pytz.utc.localize(self.start).isoformat(), 'timeZone': 'Europe/London'}
-                end = {'dateTime': pytz.utc.localize(self.stop).isoformat(), 'timeZone': 'Europe/London'}
+                start = {'dateTime': self.start.replace(tzinfo=UTC).isoformat(), 'timeZone': 'Europe/London'}
+                end = {'dateTime': self.stop.replace(tzinfo=UTC).isoformat(), 'timeZone': 'Europe/London'}
 
             values['start'] = start
             values['end'] = end
@@ -666,8 +684,8 @@ class CalendarEvent(models.Model):
             start = {'dateTime': self.start_date.isoformat(), 'timeZone': 'Europe/London'}
             end = {'dateTime': (self.stop_date + relativedelta(days=1)).isoformat(), 'timeZone': 'Europe/London'}
         else:
-            start = {'dateTime': pytz.utc.localize(self.start).isoformat(), 'timeZone': 'Europe/London'}
-            end = {'dateTime': pytz.utc.localize(self.stop).isoformat(), 'timeZone': 'Europe/London'}
+            start = {'dateTime': self.start.replace(tzinfo=UTC).isoformat(), 'timeZone': 'Europe/London'}
+            end = {'dateTime': self.stop.replace(tzinfo=UTC).isoformat(), 'timeZone': 'Europe/London'}
 
         values['start'] = start
         values['end'] = end
@@ -684,9 +702,7 @@ class CalendarEvent(models.Model):
         """
         user = self.env.user
         records = self.filtered(lambda e: not e.user_id or e.user_id == user or user.partner_id in e.partner_ids)
-        for event in records:
-            # remove the tracking data to avoid calling _track_template in the pre-commit phase
-            self.env.cr.precommit.data.pop(f'mail.tracking.create.{event._name}.{event.id}', None)
+        records._track_clear_for_template()
         super(CalendarEvent, records)._cancel_microsoft()
         attendees = (self - records).attendee_ids.filtered(lambda a: a.partner_id == user.partner_id)
         attendees.do_decline()

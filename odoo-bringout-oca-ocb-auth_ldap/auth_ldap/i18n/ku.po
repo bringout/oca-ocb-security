@@ -22,9 +22,13 @@ msgstr ""
 #. module: auth_ldap
 #: model:ir.model.fields,help:auth_ldap.field_res_company_ldap__ldap_filter
 msgid ""
-"    Filter used to look up user accounts in the LDAP database. It is an    arbitrary LDAP filter in string representation. Any `%s` placeholder    will be replaced by the login (identifier) provided by the user, the filter    should contain at least one such placeholder.\n"
+"    Filter used to look up user accounts in the LDAP database. It is an    "
+"arbitrary LDAP filter in string representation. Any `%s` placeholder    will "
+"be replaced by the login (identifier) provided by the user, the filter    "
+"should contain at least one such placeholder.\n"
 "\n"
-"    The filter must result in exactly one (1) result, otherwise the login will    be considered invalid.\n"
+"    The filter must result in exactly one (1) result, otherwise the login "
+"will    be considered invalid.\n"
 "\n"
 "    Example (actual attributes depend on LDAP server and setup):\n"
 "\n"
@@ -58,7 +62,7 @@ msgstr ""
 #. module: auth_ldap
 #: model:ir.model,name:auth_ldap.model_res_company
 msgid "Companies"
-msgstr "کۆمپانیاکان"
+msgstr ""
 
 #. module: auth_ldap
 #: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__company
@@ -214,8 +218,8 @@ msgstr ""
 #: model:ir.model.fields,help:auth_ldap.field_res_company_ldap__ldap_tls
 msgid ""
 "Request secure TLS/SSL encryption when connecting to the LDAP server. This "
-"option requires a server with STARTTLS enabled, otherwise all authentication"
-" attempts will fail."
+"option requires a server with STARTTLS enabled, otherwise all authentication "
+"attempts will fail."
 msgstr ""
 
 #. module: auth_ldap

@@ -17,7 +17,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 15.5alpha1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:36+0000\n"
+"POT-Creation-Date: 2025-10-08 18:37+0000\n"
 "PO-Revision-Date: 2025-11-16 15:03+0000\n"
 "Last-Translator: Weblate <noreply-mt-weblate@weblate.org>\n"
 "Language-Team: Hebrew <https://translate.odoo.com/projects/odoo-19/"
@@ -271,15 +271,3 @@ msgstr ""
 #: model_terms:ir.ui.view,arch_db:auth_oauth.res_config_settings_view_form
 msgid "e.g. 1234-xyz.apps.googleusercontent.com"
 msgstr ""
-
-#~ msgid "- or -"
-#~ msgstr "- או -"
-
-#~ msgid "Log in with Facebook"
-#~ msgstr "התחברות עם פייסבוק"
-
-#~ msgid "Log in with Google"
-#~ msgstr "התחברות עם גוגל"
-
-#~ msgid "Log in with Odoo.com"
-#~ msgstr "התחברות עם Odoo.com"

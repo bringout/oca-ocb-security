@@ -1,17 +1,15 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
-import pytz
-from datetime import datetime, timedelta
-from markupsafe import Markup
-from unittest.mock import patch, MagicMock
 from contextlib import contextmanager
+from datetime import datetime, timedelta, UTC
+from unittest.mock import patch, MagicMock
+
 from freezegun import freeze_time
+from markupsafe import Markup
 
 from odoo import fields
-
 from odoo.tests.common import HttpCase
 from odoo.tools import mute_logger
-
 from odoo.addons.microsoft_calendar.models.microsoft_sync import MicrosoftCalendarSync
 
 
@@ -124,11 +122,11 @@ class TestCommon(HttpCase):
                 'contentType': "text",
             },
             "start": {
-                'dateTime': pytz.utc.localize(self.simple_event_values["start"]).isoformat(),
+                'dateTime': self.simple_event_values["start"].replace(tzinfo=UTC).isoformat(),
                 'timeZone': 'Europe/London'
             },
             "end": {
-                'dateTime': pytz.utc.localize(self.simple_event_values["stop"]).isoformat(),
+                'dateTime': self.simple_event_values["stop"].replace(tzinfo=UTC).isoformat(),
                 'timeZone': 'Europe/London'
             },
             "isAllDay": False,
@@ -558,6 +556,7 @@ class TestCommon(HttpCase):
 
         # need to manually handle post-commit hooks calls as `self.env.cr.postcommit.run()` clean
         # the queue at the end of the first post-commit hook call ...
+        self.env.cr.flush()  # flush changes first
         funcs = self.env.cr.postcommit._funcs.copy()
         while funcs:
             func = funcs.popleft()

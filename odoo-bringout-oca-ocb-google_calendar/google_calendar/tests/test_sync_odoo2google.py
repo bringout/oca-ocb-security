@@ -13,20 +13,31 @@ from odoo.tests import tagged
 from odoo import tools
 
 
-@tagged('odoo2google', 'calendar_performance', 'is_query_count')
+@tagged('odoo2google')
 @patch.object(ResUsers, '_get_google_calendar_token', lambda user: 'dummy-token')
-class TestSyncOdoo2Google(TestSyncGoogle):
+class TestSyncOdoo2GoogleCommon(TestSyncGoogle):
+
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
         cls.env.user.partner_id.tz = "Europe/Brussels"
         cls.google_service = GoogleCalendarService(cls.env['google.service'])
+        cls.partner_jean_luc = cls.env["res.partner"].create({
+            "name": "Jean-Luc",
+            "email": "jean-luc@opoo.com"
+        })
         # Make sure this test will work for the next 30 years
-        cls.env['ir.config_parameter'].set_param('google_calendar.sync.range_days', 10000)
+        cls.env['ir.config_parameter'].set_int('google_calendar.sync.range_days', 10000)
+        cls.env["ir.config_parameter"].set_bool("google_calendar.disable_auto_videocall_link", False)
+
+
+@tagged('calendar_performance', 'is_query_count')
+@patch.object(ResUsers, '_get_google_calendar_token', lambda user: 'dummy-token')
+@tagged('at_install', '-post_install')  # LEGACY at_install
+class TestSyncOdoo2Google(TestSyncOdoo2GoogleCommon):
 
     @patch_api
     def test_event_creation(self):
-        partner = self.env['res.partner'].create({'name': 'Jean-Luc', 'email': 'jean-luc@opoo.com'})
         alarm = self.env['calendar.alarm'].create({
             'name': 'Notif',
             'alarm_type': 'notification',
@@ -38,7 +49,7 @@ class TestSyncOdoo2Google(TestSyncGoogle):
             'name': "Event",
             'start': datetime(2020, 1, 15, 8, 0),
             'stop': datetime(2020, 1, 15, 18, 0),
-            'partner_ids': [(4, partner.id)],
+            'partner_ids': [(4, self.partner_jean_luc.id)],
             'alarm_ids': [(4, alarm.id)],
             'privacy': 'private',
             'need_sync': False,
@@ -98,7 +109,6 @@ class TestSyncOdoo2Google(TestSyncGoogle):
     @users('__system__')
     @warmup
     def test_recurring_event_creation_perf(self):
-        partner = self.env['res.partner'].create({'name': 'Jean-Luc', 'email': 'jean-luc@opoo.com'})
         alarm = self.env['calendar.alarm'].create({
             'name': 'Notif',
             'alarm_type': 'notification',
@@ -111,7 +121,7 @@ class TestSyncOdoo2Google(TestSyncGoogle):
                 'name': "Event",
                 'start': datetime(2020, 1, 15, 8, 0),
                 'stop': datetime(2020, 1, 15, 18, 0),
-                'partner_ids': [(4, partner.id)],
+                'partner_ids': [(4, self.partner_jean_luc.id)],
                 'alarm_ids': [(4, alarm.id)],
                 'privacy': 'private',
                 'need_sync': False,
@@ -120,7 +130,7 @@ class TestSyncOdoo2Google(TestSyncGoogle):
                 'rrule_type': 'daily',
                 'end_type': 'forever',
                 'res_model_id': partner_model.id,
-                'res_id': partner.id,
+                'res_id': self.partner_jean_luc.id,
             })
 
         with self.assertQueryCount(__system__=29):
@@ -140,7 +150,7 @@ class TestSyncOdoo2Google(TestSyncGoogle):
 
     @patch_api
     def test_event_without_attendee_state(self):
-        partner_1 = self.env['res.partner'].create({'name': 'Jean-Luc', 'email': 'jean-luc@opoo.com'})
+        partner_1 = self.partner_jean_luc
         partner_2 = self.env['res.partner'].create({'name': 'Phineas', 'email': 'phineas@opoo.com'})
         partner_3 = self.env['res.partner'].create({'name': 'Ferb'})
         event = self.env['calendar.event'].create({
@@ -165,7 +175,7 @@ class TestSyncOdoo2Google(TestSyncGoogle):
             'location': '',
             'visibility': 'private',
             'guestsCanModify': True,
-            'reminders': {'useDefault': False, 'overrides': []},
+            'reminders': {'useDefault': False, 'overrides': [{'method': 'popup', 'minutes': 15}]},
             'organizer': {'email': 'odoobot@example.com', 'self': True},
             'attendees': [{'email': 'jean-luc@opoo.com', 'responseStatus': 'needsAction'},
                           {'email': 'phineas@opoo.com', 'responseStatus': 'needsAction'}],
@@ -191,7 +201,7 @@ class TestSyncOdoo2Google(TestSyncGoogle):
             'description': '',
             'location': '',
             'guestsCanModify': True,
-            'reminders': {'overrides': [], 'useDefault': False},
+            'reminders': {'overrides': [{'method': 'popup', 'minutes': 15}], 'useDefault': False},
             'organizer': {'email': 'odoobot@example.com', 'self': True},
             'attendees': [{'email': 'odoobot@example.com', 'responseStatus': 'accepted'}],
             'extendedProperties': {'shared': {'%s_odoo_id' % self.env.cr.dbname: event.id}},
@@ -252,7 +262,7 @@ class TestSyncOdoo2Google(TestSyncGoogle):
             'description': '',
             'location': '',
             'guestsCanModify': True,
-            'reminders': {'overrides': [], 'useDefault': False},
+            'reminders': {'overrides': [{'method': 'popup', 'minutes': 15}], 'useDefault': False},
             'organizer': {'email': 'odoobot@example.com', 'self': True},
             'attendees': [{'email': 'odoobot@example.com', 'responseStatus': 'accepted'}],
             'recurrence': ['RRULE:FREQ=WEEKLY;COUNT=2;BYDAY=WE'],
@@ -287,7 +297,7 @@ class TestSyncOdoo2Google(TestSyncGoogle):
             'description': '',
             'location': '',
             'guestsCanModify': True,
-            'reminders': {'overrides': [], 'useDefault': False},
+            'reminders': {'overrides': [{'method': 'popup', 'minutes': 15}], 'useDefault': False},
             'organizer': {'email': 'odoobot@example.com', 'self': True},
             'attendees': [{'email': 'odoobot@example.com', 'responseStatus': 'accepted'}],
             'recurrence': ['RRULE:FREQ=WEEKLY;COUNT=2;BYDAY=WE'],
@@ -338,7 +348,7 @@ class TestSyncOdoo2Google(TestSyncGoogle):
             'organizer': {'email': 'odoobot@example.com', 'self': True},
             'attendees': [{'email': 'odoobot@example.com', 'responseStatus': 'accepted'}],
             'extendedProperties': {'shared': {'%s_odoo_id' % self.env.cr.dbname: event.recurrence_id.id}},
-            'reminders': {'overrides': [], 'useDefault': False},
+            'reminders': {'overrides': [{'method': 'popup', 'minutes': 15}], 'useDefault': False},
             'recurrence': ['RRULE:FREQ=WEEKLY;WKST=SU;COUNT=1;BYDAY=WE'],
             'transparency': 'opaque',
         }, timeout=3)
@@ -362,11 +372,10 @@ class TestSyncOdoo2Google(TestSyncGoogle):
     def test_restart_synchronization(self):
         # Test new event created after stopping synchronization are correctly patched when restarting sync.
         google_id = 'aaaaaaaaa'
-        partner = self.env['res.partner'].create({'name': 'Jean-Luc', 'email': 'jean-luc@opoo.com'})
         user = self.env['res.users'].create({
             'name': 'Test user Calendar',
             'login': 'jean-luc@opoo.com',
-            'partner_id': partner.id,
+            'partner_id': self.partner_jean_luc.id,
         })
         user.stop_google_synchronization()
         event = self.env['calendar.event'].with_user(user).create({
@@ -374,7 +383,7 @@ class TestSyncOdoo2Google(TestSyncGoogle):
             'name': "Event",
             'start': datetime(2020, 1, 15, 8, 0),
             'stop': datetime(2020, 1, 15, 18, 0),
-            'partner_ids': [(4, partner.id)],
+            'partner_ids': [(4, self.partner_jean_luc.id)],
         })
 
         user.with_user(user).restart_google_synchronization()
@@ -386,7 +395,7 @@ class TestSyncOdoo2Google(TestSyncGoogle):
             'description': event.description,
             'location': '',
             'guestsCanModify': True,
-            'reminders': {'overrides': [], 'useDefault': False},
+            'reminders': {'overrides': [{'method': 'popup', 'minutes': 15}], 'useDefault': False},
             'organizer': {'email': 'jean-luc@opoo.com', 'self': True},
             'attendees': [{'email': 'jean-luc@opoo.com', 'responseStatus': 'accepted'}],
             'extendedProperties': {'shared': {'%s_odoo_id' % self.env.cr.dbname: event.id}},
@@ -427,7 +436,7 @@ class TestSyncOdoo2Google(TestSyncGoogle):
             'attendees': [{'email': 'odoobot@example.com', 'responseStatus': 'accepted'}],
             'recurrence': ['RRULE:FREQ=WEEKLY;WKST=SU;COUNT=2;BYDAY=WE'],
             'extendedProperties': {'shared': {'%s_odoo_id' % self.env.cr.dbname: new_recurrence.id}},
-            'reminders': {'overrides': [], 'useDefault': False},
+            'reminders': {'overrides': [{'method': 'popup', 'minutes': 15}], 'useDefault': False},
             'transparency': 'opaque',
         }, timeout=3)
 
@@ -531,14 +540,13 @@ class TestSyncOdoo2Google(TestSyncGoogle):
     @patch_api
     def test_attendee_state(self):
         """ Sync attendee state immediately """
-        partner = self.env['res.partner'].create({'name': 'Jean-Luc', 'email': 'jean-luc@opoo.com'})
         event = self.env['calendar.event'].create({
             'name': "Event with attendees",
             'start': datetime(2020, 1, 15),
             'stop': datetime(2020, 1, 15),
             'allday': True,
             'need_sync': False,
-            'partner_ids': [(4, partner.id)],
+            'partner_ids': [(4, self.partner_jean_luc.id)],
             'google_id': 'aaaaaaaaa',
         })
         self.assertEqual(event.attendee_ids.state, 'needsAction',
@@ -556,7 +564,7 @@ class TestSyncOdoo2Google(TestSyncGoogle):
             'organizer': {'email': 'odoobot@example.com', 'self': True},
             'attendees': [{'email': 'jean-luc@opoo.com', 'responseStatus': 'declined'}],
             'extendedProperties': {'shared': {'%s_odoo_id' % self.env.cr.dbname: event.id}},
-            'reminders': {'overrides': [], 'useDefault': False},
+            'reminders': {'overrides': [{'method': 'popup', 'minutes': 15}], 'useDefault': False},
             'transparency': 'opaque',
         })
 
@@ -594,7 +602,7 @@ class TestSyncOdoo2Google(TestSyncGoogle):
             'attendees': [{'email': 'odoobot@example.com', 'responseStatus': 'accepted'}],
             'recurrence': ['RRULE:FREQ=WEEKLY;WKST=SU;COUNT=2;BYDAY=WE'],
             'extendedProperties': {'shared': {'%s_odoo_id' % self.env.cr.dbname: new_recurrence.id}},
-            'reminders': {'overrides': [], 'useDefault': False},
+            'reminders': {'overrides': [{'method': 'popup', 'minutes': 15}], 'useDefault': False},
             'transparency': 'opaque',
         }, timeout=3)
 
@@ -637,7 +645,7 @@ class TestSyncOdoo2Google(TestSyncGoogle):
             'organizer': {'email': 'odoobot@example.com', 'self': True},
             'attendees': [{'email': 'odoobot@example.com', 'responseStatus': 'accepted'}],
             'extendedProperties': {'shared': {'%s_odoo_id' % self.env.cr.dbname: event_1.id}},
-            'reminders': {'overrides': [], 'useDefault': False},
+            'reminders': {'overrides': [{'method': 'popup', 'minutes': 15}], 'useDefault': False},
             'status': 'cancelled',
             'transparency': 'opaque',
         }, timeout=3)
@@ -737,20 +745,6 @@ class TestSyncOdoo2Google(TestSyncGoogle):
         self.assertGoogleEventNotDeleted()
 
     @patch_api
-    def test_videocall_location_on_location_set(self):
-        partner = self.env['res.partner'].create({'name': 'Jean-Luc', 'email': 'jean-luc@opoo.com'})
-        event = self.env['calendar.event'].create({
-            'name': "Event",
-            'start': datetime(2020, 1, 15, 8, 0),
-            'stop': datetime(2020, 1, 15, 18, 0),
-            'partner_ids': [(4, partner.id)],
-            'need_sync': False,
-            'location' : 'Event Location'
-        })
-        event._sync_odoo2google(self.google_service)
-        self.assertGoogleEventInserted({'conferenceData': False})
-
-    @patch_api
     def test_event_available_privacy(self):
         """ Create an event with "Available" value for 'show_as' and assert value is properly sync in google calendar. """
         event = self.env['calendar.event'].create({
@@ -769,7 +763,7 @@ class TestSyncOdoo2Google(TestSyncGoogle):
             'description': '',
             'location': '',
             'guestsCanModify': True,
-            'reminders': {'overrides': [], 'useDefault': False},
+            'reminders': {'overrides': [{'method': 'popup', 'minutes': 15}], 'useDefault': False},
             'organizer': {'email': 'odoobot@example.com', 'self': True},
             'attendees': [{'email': 'odoobot@example.com', 'responseStatus': 'accepted'}],
             'extendedProperties': {'shared': {'%s_odoo_id' % self.env.cr.dbname: event.id}},
@@ -795,7 +789,7 @@ class TestSyncOdoo2Google(TestSyncGoogle):
             'description': '',
             'location': '',
             'guestsCanModify': True,
-            'reminders': {'overrides': [], 'useDefault': False},
+            'reminders': {'overrides': [{'method': 'popup', 'minutes': 15}], 'useDefault': False},
             'organizer': {'email': 'odoobot@example.com', 'self': True},
             'attendees': [{'email': 'odoobot@example.com', 'responseStatus': 'accepted'}],
             'extendedProperties': {'shared': {'%s_odoo_id' % self.env.cr.dbname: event.id}},
@@ -842,7 +836,7 @@ class TestSyncOdoo2Google(TestSyncGoogle):
             'location': '',
             'guestsCanModify': True,
             'transparency': 'opaque',
-            'reminders': {'overrides': [], 'useDefault': False},
+            'reminders': {'overrides': [{'method': 'popup', 'minutes': 15}], 'useDefault': False},
             'organizer': {'email': self.organizer_user.email, 'self': True},
             'attendees': [
                             {'email': self.attendee_user.email, 'responseStatus': 'needsAction'},
@@ -883,7 +877,7 @@ class TestSyncOdoo2Google(TestSyncGoogle):
             'description': event.description,
             'location': '',
             'guestsCanModify': True,
-            'reminders': {'overrides': [], 'useDefault': False},
+            'reminders': {'overrides': [{'method': 'popup', 'minutes': 15}], 'useDefault': False},
             'organizer': {'email': self.organizer_user.email, 'self': True},
             'attendees': [{'email': self.organizer_user.email, 'responseStatus': 'accepted'}],
             'recurrence': ['RRULE:FREQ=WEEKLY;COUNT=1;BYDAY=WE'],
@@ -939,7 +933,7 @@ class TestSyncOdoo2Google(TestSyncGoogle):
                 'location': '',
                 'guestsCanModify': True,
                 'transparency': 'opaque',
-                'reminders': {'overrides': [], 'useDefault': False},
+                'reminders': {'overrides': [{'method': 'popup', 'minutes': 15}], 'useDefault': False},
                 'organizer': {'email': self.organizer_user.email, 'self': True},
                 'attendees': [
                                 {'email': self.attendee_user.email, 'responseStatus': 'needsAction'},
@@ -972,7 +966,7 @@ class TestSyncOdoo2Google(TestSyncGoogle):
                             {'email': self.attendee_user.email, 'responseStatus': 'needsAction'},
                             {'email': self.organizer_user.email, 'responseStatus': 'accepted'}
                          ],
-            'reminders': {'overrides': [], 'useDefault': False},
+            'reminders': {'overrides': [{'method': 'popup', 'minutes': 15}], 'useDefault': False},
             'transparency': 'opaque',
         }
         self.assertGoogleEventInsertedMultiTime({
@@ -1116,3 +1110,51 @@ class TestSyncOdoo2Google(TestSyncGoogle):
             'extendedProperties': {'shared': {'%s_odoo_id' % self.env.cr.dbname: event.id}},
             'transparency': 'opaque',
         }, timeout=3)
+
+
+@patch.object(ResUsers, '_get_google_calendar_token', lambda user: 'dummy-token')
+@tagged('-at_install', 'post_install')
+class TestSyncOdoo2GooglePostInstall(TestSyncOdoo2GoogleCommon):
+
+    @patch_api
+    @users('organizer_user')
+    def test_videocall_location_generation(self):
+        """
+        Test the automated generation of the videocall link. We make sure that
+        cal_google_disable_auto_videocall_link setting is correctly handled on creating
+        new meetings without location, and that links are not created when location is set.
+        """
+        self.assertGoogleEventNotInserted()
+        for location, disable_link_generation_setting, expected_link_generation in [
+            ("Location Set", False, False),
+            ("Location Set", True, False),
+            (False, False, True),
+            (False, True, False),
+        ]:
+            with self.subTest(
+                location=location,
+                disable_link_generation_setting=disable_link_generation_setting,
+            ):
+                # Reset insert values manually as we are doing subtests
+                self._gsync_insert_values = []
+                self.env["ir.config_parameter"].sudo().set_bool(
+                    "google_calendar.disable_auto_videocall_link",
+                    disable_link_generation_setting
+                )
+                event = self.env["calendar.event"].create({
+                    "name": "test-disable-link-generation",
+                    "start": datetime(2020, 1, 15, 8, 0),
+                    "stop": datetime(2020, 1, 15, 18, 0),
+                    "partner_ids": [(4, self.partner_jean_luc.id)],
+                    "need_sync": False,
+                    "location": location,
+                })
+
+                event._sync_odoo2google(self.google_service)
+                self.assertGoogleEventInserted({"summary": "test-disable-link-generation"})
+                insert_values, _unused = self._gsync_insert_values[0]
+
+                if expected_link_generation:
+                    self.assertTrue(insert_values["conferenceData"]["createRequest"]["requestId"])
+                else:
+                    self.assertFalse(insert_values.get("conferenceData"))

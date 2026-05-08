@@ -11,7 +11,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 15.5alpha1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:36+0000\n"
+"POT-Creation-Date: 2025-10-08 18:37+0000\n"
 "PO-Revision-Date: 2025-09-16 21:37+0000\n"
 "Last-Translator: \"Tiffany Chang (tic)\" <tic@odoo.com>\n"
 "Language-Team: Thai <https://translate.odoo.com/projects/odoo-19/auth_oauth/"
@@ -266,21 +266,3 @@ msgstr "โค้ง"
 #: model_terms:ir.ui.view,arch_db:auth_oauth.res_config_settings_view_form
 msgid "e.g. 1234-xyz.apps.googleusercontent.com"
 msgstr "เช่น 1234-xyz.apps.googleusercontent.com"
-
-#~ msgid "- or -"
-#~ msgstr "- หรือ -"
-
-#~ msgid "Log in with Facebook"
-#~ msgstr "เข้าสู่ระบบด้วย Facebook"
-
-#~ msgid "Log in with Google"
-#~ msgstr "เข้าสู่ระบบด้วย Google"
-
-#~ msgid "Log in with Odoo.com"
-#~ msgstr "เข้าสู่ระบบด้วย Odoo.com"
-
-#~ msgid "OAuth Access Token"
-#~ msgstr "โทเคนการเข้าถึง OAuth"
-
-#~ msgid "Oauth"
-#~ msgstr "Oauth"

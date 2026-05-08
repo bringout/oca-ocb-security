@@ -1,3 +1,4 @@
+import { render } from "@web/owl2/utils";
 import { AttendeeCalendarController } from "@calendar/views/attendee_calendar/attendee_calendar_controller";
 
 import { _t } from "@web/core/l10n/translation";
@@ -30,7 +31,6 @@ patch(AttendeeCalendarController.prototype, {
                     confirm: this.actionService.doAction.bind(this.actionService, syncResult.action),
                     confirmLabel: _t("Configure"),
                     cancel: () => {},
-                    cancelLabel: _t("Discard"),
                 });
             } else {
                 this.dialog.add(AlertDialog, {
@@ -40,7 +40,7 @@ patch(AttendeeCalendarController.prototype, {
             }
         } else {
             await this.model.load();
-            this.render(true);
+            render(this, true);
         }
     },
 
@@ -51,7 +51,7 @@ patch(AttendeeCalendarController.prototype, {
             [[user.userId]],
         );
         await this.model.load();
-        this.render(true);
+        render(this, true);
     },
 
     async onUnpauseGoogleSynchronization() {
@@ -61,6 +61,6 @@ patch(AttendeeCalendarController.prototype, {
             [[user.userId]],
         );
         await this.onStopGoogleSynchronization();
-        this.render(true);
+        render(this, true);
     }
 });

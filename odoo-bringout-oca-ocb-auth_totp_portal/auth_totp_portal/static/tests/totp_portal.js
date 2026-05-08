@@ -2,7 +2,6 @@ import { registry } from "@web/core/registry";
 import { rpc } from "@web/core/network/rpc";
 
 registry.category("web_tour.tours").add('totportal_tour_setup', {
-    url: '/my/security',
     steps: () => [{
     content: "Open totp wizard",
     trigger: 'button#auth_totp_portal_enable',
@@ -45,7 +44,6 @@ registry.category("web_tour.tours").add('totportal_tour_setup', {
 }]});
 
 registry.category("web_tour.tours").add('totportal_login_enabled', {
-    url: '/',
     steps: () => [{
     content: "check that we're on the login page or go to it",
     isActive: ["body:not(:has(input#login))"],
@@ -82,7 +80,7 @@ registry.category("web_tour.tours").add('totportal_login_enabled', {
     expectUnloadPage: true,
 }, {
     content: "check we're logged in",
-    trigger: "h3:contains(My account)",
+    trigger: "h1:contains(My account)",
 }, {
     content: "go back to security",
     trigger: "a:contains(Security)",
@@ -110,7 +108,6 @@ registry.category("web_tour.tours").add('totportal_login_enabled', {
 }]});
 
 registry.category("web_tour.tours").add('totportal_login_disabled', {
-    url: '/',
     steps: () => [{
     content: "check that we're on the login page or go to it",
     isActive: ["body:not(:has(input#login))"],
@@ -132,5 +129,5 @@ registry.category("web_tour.tours").add('totportal_login_disabled', {
     expectUnloadPage: true,
 }, {
     content: "check we're logged in",
-    trigger: "h3:contains(My account)",
+    trigger: "h1:contains(My account)",
 }]});

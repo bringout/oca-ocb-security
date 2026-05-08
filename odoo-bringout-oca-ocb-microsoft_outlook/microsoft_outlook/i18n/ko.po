@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Odoo Server 18.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-25 18:36+0000\n"
+"POT-Creation-Date: 2025-11-07 18:36+0000\n"
 "PO-Revision-Date: 2025-12-11 06:44+0000\n"
 "Last-Translator: \"Kwanghee Park (kwpa)\" <kwpa@odoo.com>\n"
 "Language-Team: Korean <https://translate.odoo.com/projects/odoo-19/"
@@ -157,8 +157,8 @@ msgid ""
 "Incorrect Connection Security for Outlook mail server “%s”. Please set it to "
 "\"TLS (STARTTLS)\"."
 msgstr ""
-"Outlook 메일 서버 “%s”에 대한 연결 보안이 잘못되었습니다. \"TLS (STARTTLS)"
-"\"로 설정하시기 바랍니다."
+"Outlook 메일 서버 “%s”에 대한 연결 보안이 잘못되었습니다. \"TLS "
+"(STARTTLS)\"로 설정하시기 바랍니다."
 
 #. module: microsoft_outlook
 #: model:ir.model,name:microsoft_outlook.model_ir_mail_server
@@ -319,16 +319,3 @@ msgstr "알 수 없는 오류"
 #: model:ir.model,name:microsoft_outlook.model_res_users
 msgid "User"
 msgstr "사용자"
-
-#~ msgid "Go back to your mail server"
-#~ msgstr "메일 서버로 돌아가기"
-
-#~ msgid "Is Outlook Credential Configured"
-#~ msgstr "Outlook 자격 증명 설정 여부"
-
-#~ msgid ""
-#~ "Setup your Outlook API credentials in the general settings to link a "
-#~ "Outlook account."
-#~ msgstr ""
-#~ "Outlook 계정을 연결하려면 일반 설정 항목에서 Outlook API 자격 증명을 설정"
-#~ "하십시오."

@@ -28,7 +28,7 @@ class GoogleCalendarService():
         self.google_service = google_service
 
     @requires_auth_token
-    def get_events(self, sync_token=None, token=None, event_id=None, timeout=TIMEOUT):
+    def get_events(self, sync_token=None, token=None, event_id=None, search_params=None, timeout=TIMEOUT):
         url = "/calendar/v3/calendars/primary/events"
         if event_id:
             url += f"/{event_id}"
@@ -39,12 +39,14 @@ class GoogleCalendarService():
         else:
             # full sync, limit to a range of 1y in past to 1y in the futur by default
             ICP = self.google_service.env['ir.config_parameter'].sudo()
-            day_range = int(ICP.get_param('google_calendar.sync.range_days', default=365))
+            day_range = ICP.get_int('google_calendar.sync.range_days') or 365
             _logger.info("Full cal sync, restricting to %s days range", day_range)
             lower_bound = fields.Datetime.subtract(fields.Datetime.now(), days=day_range)
             upper_bound = fields.Datetime.add(fields.Datetime.now(), days=day_range)
             params['timeMin'] = lower_bound.isoformat() + 'Z'  # Z = UTC (RFC3339)
             params['timeMax'] = upper_bound.isoformat() + 'Z'  # Z = UTC (RFC3339)
+        if search_params:
+            params.update(search_params)
         try:
             status, data, time = self.google_service._do_request(url, params, headers, method='GET', timeout=timeout)
         except requests.HTTPError as e:
@@ -124,7 +126,7 @@ class GoogleCalendarService():
             'd': self.google_service.env.cr.dbname,
             's': 'calendar',
             'f': from_url,
-            'u': self.google_service.env['ir.config_parameter'].sudo().get_param('database.uuid'),
+            'u': self.google_service.env['ir.config_parameter'].sudo().get_str('database.uuid'),
         }
         base_url = self.google_service.env.context.get('base_url') or self.google_service.get_base_url()
         return self.google_service._get_authorize_uri(
