@@ -1,36 +1,22 @@
-# Translation of Odoo Server.
-# This file contains the translation of the following modules:
-# * auth_ldap
 #
-# Translators:
-# Martin Trigaux, 2018
-# Boško Stojaković <bluesoft83@gmail.com>, 2018
-# Bole <bole@dajmi5.com>, 2018
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server saas~11.5\n"
+"Project-Id-Version: Odoo Server master (auth_ldap)\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-02-20 10:02+0000\n"
-"PO-Revision-Date: 2018-09-21 13:17+0000\n"
-"Last-Translator: Bole <bole@dajmi5.com>, 2018\n"
-"Language-Team: Bosnian (https://www.transifex.com/odoo/teams/41243/bs/)\n"
+"Language-Team: Bosnian\n"
 "Language: bs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#. module: auth_ldap
-#: model:ir.model.fields,help:auth_ldap.field_res_company_ldap__ldap_filter
+# model:
+# model:ir.model.fields,help:auth_ldap.field_res_company_ldap__ldap_filter
+#, []
 msgid ""
-"    Filter used to look up user accounts in the LDAP database. It is an    "
-"arbitrary LDAP filter in string representation. Any `%s` placeholder    will "
-"be replaced by the login (identifier) provided by the user, the filter    "
-"should contain at least one such placeholder.\n"
+"    Filter used to look up user accounts in the LDAP database. It is an    arbitrary LDAP filter in string representation. Any `%s` placeholder    will be replaced by the login (identifier) provided by the user, the filter    should contain at least one such placeholder.\n"
 "\n"
-"    The filter must result in exactly one (1) result, otherwise the login "
-"will    be considered invalid.\n"
+"    The filter must result in exactly one (1) result, otherwise the login will    be considered invalid.\n"
 "\n"
 "    Example (actual attributes depend on LDAP server and setup):\n"
 "\n"
@@ -41,250 +27,276 @@ msgid ""
 "        (|(mail=%s)(uid=%s))\n"
 "    "
 msgstr ""
+"    Filter koji se koristi za pretraživanje korisničkih računa u LDAP bazi podataka. Predstavlja proizvoljan LDAP filter u tekstualnom formatu. Svaki `%s` rezervirano mjesto će biti zamijenjeno prijavnim imenom (identifikatorom) koje je korisnik unio, filter treba sadržavati najmanje jedno takvo rezervirano mjesto.\n"
+"\n"
+"    Filter mora rezultirati tačno jednim (1) rezultatom, inače će prijava biti smatrana neispravnom.\n"
+"\n"
+"    Primjer (stvarni atributi ovise o LDAP serveru i postavkama):\n"
+"\n"
+"        (&(objectCategory=person)(objectClass=user)(sAMAccountName=%s))\n"
+"\n"
+"    ili\n"
+"\n"
+"        (|(mail=%s)(uid=%s))\n"
+"    "
 
-#. module: auth_ldap
-#. odoo-python
-#: code:addons/auth_ldap/models/res_company_ldap.py:0
+# model: code:addons/auth_ldap/models/res_company_ldap.py
+#, []
 msgid "An error occurred: %(error)s"
-msgstr ""
+msgstr "Došlo je do greške: %(error)s"
 
-#. module: auth_ldap
-#: model:ir.model.fields,help:auth_ldap.field_res_company_ldap__create_user
+# model:
+# model:ir.model.fields,help:auth_ldap.field_res_company_ldap__create_user
+#, []
 msgid ""
 "Automatically create local user accounts for new users authenticating via "
 "LDAP"
 msgstr ""
+"Automatski kreiraj nove korisničke račune za korisnike koji se autoriziraju "
+"putem LDAP-a"
 
-#. module: auth_ldap
-#. odoo-python
-#: code:addons/auth_ldap/models/res_company_ldap.py:0
+# model: code:addons/auth_ldap/models/res_company_ldap.py
+#, []
 msgid "Cannot contact LDAP server at %(server)s:%(port)d"
-msgstr ""
+msgstr "Nije moguće kontaktirati LDAP server na %(server)s:%(port)d"
 
-#. module: auth_ldap
-#: model:ir.model,name:auth_ldap.model_res_company
-msgid "Companies"
-msgstr ""
-
-#. module: auth_ldap
-#: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__company
+# model: model:ir.model,name:auth_ldap.model_res_company
+#, []
 msgid "Company"
 msgstr "Kompanija"
 
-#. module: auth_ldap
-#: model:ir.model,name:auth_ldap.model_res_company_ldap
+# model: model:ir.model,name:auth_ldap.model_res_company_ldap
+#, []
 msgid "Company LDAP configuration"
-msgstr ""
+msgstr "LDAP postavke tvrtke"
 
-#. module: auth_ldap
-#: model:ir.model,name:auth_ldap.model_res_config_settings
+# model: model:ir.model,name:auth_ldap.model_res_config_settings
+#, []
 msgid "Config Settings"
-msgstr ""
+msgstr "Postavke konfiguracije"
 
-#. module: auth_ldap
-#. odoo-python
-#: code:addons/auth_ldap/models/res_company_ldap.py:0
+# model: code:addons/auth_ldap/models/res_company_ldap.py
+#, []
 msgid "Connection Test Failed!"
-msgstr ""
+msgstr "Test konekcije neuspješan!"
 
-#. module: auth_ldap
-#. odoo-python
-#: code:addons/auth_ldap/models/res_company_ldap.py:0
+# model: code:addons/auth_ldap/models/res_company_ldap.py
+#, []
 msgid "Connection Test Successful!"
-msgstr ""
+msgstr "Test konekcije uspješan!"
 
-#. module: auth_ldap
-#. odoo-python
-#: code:addons/auth_ldap/models/res_company_ldap.py:0
+# model: code:addons/auth_ldap/models/res_company_ldap.py
+#, []
 msgid "Connection to LDAP server at %(server)s:%(port)d timed out"
-msgstr ""
+msgstr "Konekcija na LDAP server %(server)s:%(port)d je istekla"
 
-#. module: auth_ldap
-#: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__create_user
+# model:
+# model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__create_user
+#, []
 msgid "Create User"
-msgstr ""
+msgstr "Kreiraj korisnika"
 
-#. module: auth_ldap
-#: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__create_uid
+# model:
+# model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__create_uid
+#, []
 msgid "Created by"
 msgstr "Kreirao"
 
-#. module: auth_ldap
-#: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__create_date
+# model:
+# model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__create_date
+#, []
 msgid "Created on"
 msgstr "Kreirano"
 
-#. module: auth_ldap
-#: model:ir.model.fields,help:auth_ldap.field_res_company_ldap__ldap_base
+# model:
+# model:ir.model.fields,help:auth_ldap.field_res_company_ldap__ldap_base
+#, []
 msgid ""
 "DN of the user search scope: all descendants of this base will be searched "
 "for users."
 msgstr ""
+"DN opsega pretrage korisnika: svi potomci ove baze će biti pretraženi za "
+"korisnike."
 
-#. module: auth_ldap
-#: model:ir.model.fields,field_description:auth_ldap.field_res_company__display_name
-#: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__display_name
-#: model:ir.model.fields,field_description:auth_ldap.field_res_config_settings__display_name
-#: model:ir.model.fields,field_description:auth_ldap.field_res_users__display_name
+# model:
+# model:ir.model.fields,field_description:auth_ldap.field_res_company__display_name
+#, []
 msgid "Display Name"
-msgstr "Prikazani naziv"
+msgstr "Naziv za prikaz"
 
-#. module: auth_ldap
-#: model:ir.model.fields,field_description:auth_ldap.field_res_company__id
-#: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__id
-#: model:ir.model.fields,field_description:auth_ldap.field_res_config_settings__id
-#: model:ir.model.fields,field_description:auth_ldap.field_res_users__id
+# model:
+# model:ir.model.fields,field_description:auth_ldap.field_res_company__id
+#, []
 msgid "ID"
 msgstr "ID"
 
-#. module: auth_ldap
-#. odoo-python
-#: code:addons/auth_ldap/models/res_company_ldap.py:0
+# model: code:addons/auth_ldap/models/res_company_ldap.py
+#, []
 msgid "Invalid credentials for bind DN %(binddn)s"
-msgstr ""
+msgstr "Neispravni podaci za bind DN %(binddn)s"
 
-#. module: auth_ldap
-#: model_terms:ir.ui.view,arch_db:auth_ldap.res_company_ldap_view_tree
-#: model_terms:ir.ui.view,arch_db:auth_ldap.view_ldap_installer_form
+# model: model_terms:ir.ui.view,arch_db:auth_ldap.res_company_ldap_view_tree
+#, []
 msgid "LDAP Configuration"
-msgstr ""
+msgstr "LDAP konfiguracija"
 
-#. module: auth_ldap
-#: model:ir.model.fields,field_description:auth_ldap.field_res_company__ldaps
-#: model:ir.model.fields,field_description:auth_ldap.field_res_config_settings__ldaps
+# model:
+# model:ir.model.fields,field_description:auth_ldap.field_res_company__ldaps
+#, []
 msgid "LDAP Parameters"
-msgstr ""
+msgstr "LDAP Parametri"
 
-#. module: auth_ldap
-#: model_terms:ir.ui.view,arch_db:auth_ldap.res_config_settings_view_form
+# model:
+# model_terms:ir.ui.view,arch_db:auth_ldap.res_config_settings_view_form
+#, []
 msgid "LDAP Server"
-msgstr ""
+msgstr "LDAP poslužitelj"
 
-#. module: auth_ldap
-#: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__ldap_server
+# model:
+# model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__ldap_server
+#, []
 msgid "LDAP Server address"
-msgstr ""
+msgstr "Adresa LDAP servera"
 
-#. module: auth_ldap
-#: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__ldap_server_port
+# model:
+# model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__ldap_server_port
+#, []
 msgid "LDAP Server port"
-msgstr ""
+msgstr "Port LDAP servera"
 
-#. module: auth_ldap
-#: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__ldap_base
+# model:
+# model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__ldap_base
+#, []
 msgid "LDAP base"
-msgstr ""
+msgstr "LDAP baza"
 
-#. module: auth_ldap
-#: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__ldap_binddn
+# model:
+# model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__ldap_binddn
+#, []
 msgid "LDAP binddn"
-msgstr ""
+msgstr "LDAP binddn"
 
-#. module: auth_ldap
-#: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__ldap_filter
+# model:
+# model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__ldap_filter
+#, []
 msgid "LDAP filter"
-msgstr ""
+msgstr "LDAP filtar"
 
-#. module: auth_ldap
-#: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__ldap_password
+# model:
+# model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__ldap_password
+#, []
 msgid "LDAP password"
-msgstr ""
+msgstr "LDAP lozinka"
 
-#. module: auth_ldap
-#: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__write_uid
+# model:
+# model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__write_uid
+#, []
 msgid "Last Updated by"
-msgstr "Zadnji ažurirao"
+msgstr "Posljednji put ažurirao"
 
-#. module: auth_ldap
-#: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__write_date
+# model:
+# model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__write_date
+#, []
 msgid "Last Updated on"
-msgstr "Zadnje ažurirano"
+msgstr "Posljednji put ažurirano"
 
-#. module: auth_ldap
-#: model_terms:ir.ui.view,arch_db:auth_ldap.view_ldap_installer_form
+# model: model_terms:ir.ui.view,arch_db:auth_ldap.view_ldap_installer_form
+#, []
 msgid "Login Information"
-msgstr ""
+msgstr "Podaci o prijavi"
 
-#. module: auth_ldap
-#. odoo-python
-#: code:addons/auth_ldap/models/res_company_ldap.py:0
+# model: code:addons/auth_ldap/models/res_company_ldap.py
+#, []
 msgid "No local user found for LDAP login and not configured to create one"
 msgstr ""
+"Nije pronađen lokalni korisnik za LDAP prijavu i nije podešeno kreiranje "
+"novog"
 
-#. module: auth_ldap
-#: model_terms:ir.ui.view,arch_db:auth_ldap.view_ldap_installer_form
+# model: model_terms:ir.ui.view,arch_db:auth_ldap.view_ldap_installer_form
+#, []
 msgid "Process Parameter"
-msgstr ""
+msgstr "Parametri procesa"
 
-#. module: auth_ldap
-#: model:ir.model.fields,help:auth_ldap.field_res_company_ldap__ldap_tls
+# model: model:ir.model.fields,help:auth_ldap.field_res_company_ldap__ldap_tls
+#, []
 msgid ""
 "Request secure TLS/SSL encryption when connecting to the LDAP server. This "
-"option requires a server with STARTTLS enabled, otherwise all authentication "
-"attempts will fail."
+"option requires a server with STARTTLS enabled, otherwise all authentication"
+" attempts will fail."
 msgstr ""
+"Zahtijeva sigurnu TLS/SSL enkripciju prilikom povezivanja na LDAP server. "
+"Ova opcija zahtijeva server sa omogućenim STARTTLS-om, inače će svi pokušaji"
+" autentifikacije propasti."
 
-#. module: auth_ldap
-#: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__sequence
+# model:
+# model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__sequence
+#, []
 msgid "Sequence"
 msgstr "Sekvenca"
 
-#. module: auth_ldap
-#: model_terms:ir.ui.view,arch_db:auth_ldap.view_ldap_installer_form
+# model: model_terms:ir.ui.view,arch_db:auth_ldap.view_ldap_installer_form
+#, []
 msgid "Server Information"
-msgstr ""
+msgstr "Informacije o poslužitelju"
 
-#. module: auth_ldap
-#: model:ir.actions.act_window,name:auth_ldap.action_ldap_installer
+# model: model:ir.actions.act_window,name:auth_ldap.action_ldap_installer
+#, []
 msgid "Setup your LDAP Server"
-msgstr ""
+msgstr "Postavite LDAP poslužitelj"
 
-#. module: auth_ldap
-#. odoo-python
-#: code:addons/auth_ldap/models/res_company_ldap.py:0
+# model: code:addons/auth_ldap/models/res_company_ldap.py
+#, []
 msgid "Successfully connected to LDAP server at %(server)s:%(port)d"
-msgstr ""
+msgstr "Uspješno povezivanje na LDAP server %(server)s:%(port)d"
 
-#. module: auth_ldap
-#: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__user
+# model:
+# model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__user
+#, []
 msgid "Template User"
-msgstr ""
+msgstr "Predložak korisnika"
 
-#. module: auth_ldap
-#: model_terms:ir.ui.view,arch_db:auth_ldap.view_ldap_installer_form
+# model: model_terms:ir.ui.view,arch_db:auth_ldap.view_ldap_installer_form
+#, []
 msgid "Test Connection"
-msgstr ""
+msgstr "Test konekcije"
 
-#. module: auth_ldap
-#: model:ir.model.fields,help:auth_ldap.field_res_company_ldap__ldap_password
+# model:
+# model:ir.model.fields,help:auth_ldap.field_res_company_ldap__ldap_password
+#, []
 msgid ""
 "The password of the user account on the LDAP server that is used to query "
 "the directory."
 msgstr ""
+"Lozinka korisničkog računa na LDAP poslužitelju koja se koristi za upite "
+"prema poslužitelju."
 
-#. module: auth_ldap
-#: model:ir.model.fields,help:auth_ldap.field_res_company_ldap__ldap_binddn
+# model:
+# model:ir.model.fields,help:auth_ldap.field_res_company_ldap__ldap_binddn
+#, []
 msgid ""
 "The user account on the LDAP server that is used to query the directory. "
 "Leave empty to connect anonymously."
 msgstr ""
+"Korisnički račun na LDAP serveru koji se koristi za pretraživanje "
+"direktorija. Ostavite prazno za anonimno povezivanje."
 
-#. module: auth_ldap
-#: model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__ldap_tls
+# model:
+# model:ir.model.fields,field_description:auth_ldap.field_res_company_ldap__ldap_tls
+#, []
 msgid "Use TLS"
-msgstr ""
+msgstr "Koristi TLS"
 
-#. module: auth_ldap
-#: model:ir.model,name:auth_ldap.model_res_users
+# model: model:ir.model,name:auth_ldap.model_res_users
+#, []
 msgid "User"
-msgstr ""
+msgstr "Korisnik"
 
-#. module: auth_ldap
-#: model_terms:ir.ui.view,arch_db:auth_ldap.view_ldap_installer_form
+# model: model_terms:ir.ui.view,arch_db:auth_ldap.view_ldap_installer_form
+#, []
 msgid "User Information"
-msgstr ""
+msgstr "Korisničke informacije"
 
-#. module: auth_ldap
-#: model:ir.model.fields,help:auth_ldap.field_res_company_ldap__user
+# model: model:ir.model.fields,help:auth_ldap.field_res_company_ldap__user
+#, []
 msgid "User to copy when creating new users"
-msgstr ""
+msgstr "Korisnik kojeg se kopira pri izradi novih korisnika"

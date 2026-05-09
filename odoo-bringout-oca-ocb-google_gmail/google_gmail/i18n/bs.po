@@ -1,304 +1,294 @@
-# Translation of Odoo Server.
-# This file contains the translation of the following modules:
-# * google_gmail
 #
-# Odoo Translation Bot <c3p@odoo.com>, 2025.
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 19.0\n"
+"Project-Id-Version: Odoo Server master (google_gmail)\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-16 18:36+0000\n"
-"PO-Revision-Date: 2025-10-08 18:38+0000\n"
-"Last-Translator: Automatically generated\n"
-"Language-Team: none\n"
+"Language-Team: Bosnian\n"
 "Language: bs\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: \n"
-"Plural-Forms: nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 
-#. module: google_gmail
-#: model_terms:ir.ui.view,arch_db:google_gmail.fetchmail_server_view_form
-#: model_terms:ir.ui.view,arch_db:google_gmail.ir_mail_server_view_form
+# model:
+# model_terms:ir.ui.view,arch_db:google_gmail.fetchmail_server_view_form
+#, []
 msgid "<i class=\"fa fa-cog\" title=\"Edit Settings\"/>"
-msgstr ""
+msgstr "<i class=\"fa fa-cog\" title=\"Uredi postavke\"/>"
 
-#. module: google_gmail
-#: model_terms:ir.ui.view,arch_db:google_gmail.fetchmail_server_view_form
-#: model_terms:ir.ui.view,arch_db:google_gmail.ir_mail_server_view_form
+# model:
+# model_terms:ir.ui.view,arch_db:google_gmail.fetchmail_server_view_form
+#, []
 msgid ""
 "<i class=\"oi oi-arrow-right\"/>\n"
 "                        Connect your Gmail account"
 msgstr ""
+"<i class=\"oi oi-arrow-right\"/>\n"
+"                        Povežite vaš Gmail nalog"
 
-#. module: google_gmail
-#: model_terms:ir.ui.view,arch_db:google_gmail.fetchmail_server_view_form
+# model:
+# model_terms:ir.ui.view,arch_db:google_gmail.fetchmail_server_view_form
+#, []
 msgid ""
-"<span invisible=\"server_type != 'gmail' or not google_gmail_refresh_token\" "
-"class=\"badge text-bg-success\">\n"
+"<span invisible=\"server_type != 'gmail' or not google_gmail_refresh_token\" class=\"badge text-bg-success\">\n"
 "                        Gmail Token Valid\n"
 "                    </span>"
 msgstr ""
+"<span invisible=\"server_type != 'gmail' or not google_gmail_refresh_token\" class=\"badge text-bg-success\">\n"
+"                        Gmail token važeći\n"
+"                    </span>"
 
-#. module: google_gmail
-#: model_terms:ir.ui.view,arch_db:google_gmail.ir_mail_server_view_form
+# model: model_terms:ir.ui.view,arch_db:google_gmail.ir_mail_server_view_form
+#, []
 msgid ""
-"<span invisible=\"smtp_authentication != 'gmail' or not "
-"google_gmail_refresh_token\" class=\"badge text-bg-success\">\n"
+"<span invisible=\"smtp_authentication != 'gmail' or not google_gmail_refresh_token\" class=\"badge text-bg-success\">\n"
 "                        Gmail Token Valid\n"
 "                    </span>"
 msgstr ""
+"<span invisible=\"smtp_authentication != 'gmail' or not google_gmail_refresh_token\" class=\"badge text-bg-success\">\n"
+"                        Gmail token važeći\n"
+"                    </span>"
 
-#. module: google_gmail
-#: model:ir.model.fields,field_description:google_gmail.field_fetchmail_server__google_gmail_access_token
-#: model:ir.model.fields,field_description:google_gmail.field_google_gmail_mixin__google_gmail_access_token
-#: model:ir.model.fields,field_description:google_gmail.field_ir_mail_server__google_gmail_access_token
+# model:
+# model:ir.model.fields,field_description:google_gmail.field_fetchmail_server__google_gmail_access_token
+#, []
 msgid "Access Token"
-msgstr ""
+msgstr "Token pristupa"
 
-#. module: google_gmail
-#: model:ir.model.fields,field_description:google_gmail.field_fetchmail_server__google_gmail_access_token_expiration
-#: model:ir.model.fields,field_description:google_gmail.field_google_gmail_mixin__google_gmail_access_token_expiration
-#: model:ir.model.fields,field_description:google_gmail.field_ir_mail_server__google_gmail_access_token_expiration
+# model:
+# model:ir.model.fields,field_description:google_gmail.field_fetchmail_server__google_gmail_access_token_expiration
+#, []
 msgid "Access Token Expiration Timestamp"
-msgstr ""
+msgstr "Vremenska oznaka isteka pristupnog tokena"
 
-#. module: google_gmail
-#: model:ir.model.fields,field_description:google_gmail.field_fetchmail_server__active
-#: model:ir.model.fields,field_description:google_gmail.field_google_gmail_mixin__active
-#: model:ir.model.fields,field_description:google_gmail.field_ir_mail_server__active
+# model:
+# model:ir.model.fields,field_description:google_gmail.field_fetchmail_server__active
+#, []
 msgid "Active"
-msgstr ""
+msgstr "Aktivno"
 
-#. module: google_gmail
-#. odoo-python
-#: code:addons/google_gmail/controllers/main.py:0
+# model: code:addons/google_gmail/controllers/main.py
+#, []
 msgid "An error occurred during the authentication process."
-msgstr ""
+msgstr "Došlo je do greške tokom procesa autentikacije."
 
-#. module: google_gmail
-#. odoo-python
-#: code:addons/google_gmail/models/google_gmail_mixin.py:0
+# model: code:addons/google_gmail/models/google_gmail_mixin.py
+#, []
 msgid "An error occurred when fetching the access token."
-msgstr ""
+msgstr "Dogodila se greška prilikom dohvaćanja pristupnog tokena."
 
-#. module: google_gmail
-#: model:ir.model.fields,field_description:google_gmail.field_ir_mail_server__smtp_authentication
+# model:
+# model:ir.model.fields,field_description:google_gmail.field_ir_mail_server__smtp_authentication
+#, []
 msgid "Authenticate with"
-msgstr ""
+msgstr "Autenticirati s"
 
-#. module: google_gmail
-#: model:ir.model,name:google_gmail.model_res_config_settings
+# model: model:ir.model,name:google_gmail.model_res_config_settings
+#, []
 msgid "Config Settings"
-msgstr ""
+msgstr "Postavke konfiguracije"
 
-#. module: google_gmail
-#. odoo-python
-#: code:addons/google_gmail/models/fetchmail_server.py:0
+# model: code:addons/google_gmail/models/fetchmail_server.py
+#, []
 msgid ""
 "Connect your Gmail account with the OAuth Authentication process. \n"
-"You will be redirected to the Gmail login page where you will need to accept "
-"the permission."
+"You will be redirected to the Gmail login page where you will need to accept the permission."
 msgstr ""
+"Povežite vaš Gmail račun s OAuth procesom autentifikacije. \n"
+"Bit ćete preusmjereni na Gmail stranicu za prijavu gdje trebate prihvatiti dozvolu."
 
-#. module: google_gmail
-#. odoo-python
-#: code:addons/google_gmail/models/ir_mail_server.py:0
+# model: code:addons/google_gmail/models/ir_mail_server.py
+#, []
 msgid ""
 "Connect your Gmail account with the OAuth Authentication process.  \n"
-"By default, only a user with a matching email address will be able to use "
-"this server. To extend its use, you should set a \"mail.default.from\" "
-"system parameter."
+"By default, only a user with a matching email address will be able to use this server. To extend its use, you should set a \"mail.default.from\" system parameter."
 msgstr ""
+"Povežite vaš Gmail račun s OAuth procesom autentifikacije. \n"
+"Po zadanome, samo korisnik s odgovarajućom email adresom će moći koristiti ovaj server. Za proširenje upotrebe, trebate postaviti \"mail.default.from\" sistemski parametar."
 
-#. module: google_gmail
-#: model:ir.model.fields,field_description:google_gmail.field_fetchmail_server__display_name
-#: model:ir.model.fields,field_description:google_gmail.field_google_gmail_mixin__display_name
-#: model:ir.model.fields,field_description:google_gmail.field_ir_mail_server__display_name
-#: model:ir.model.fields,field_description:google_gmail.field_res_config_settings__display_name
-#: model:ir.model.fields,field_description:google_gmail.field_res_users__display_name
+# model:
+# model:ir.model.fields,field_description:google_gmail.field_fetchmail_server__display_name
+#, []
 msgid "Display Name"
-msgstr ""
+msgstr "Naziv za prikaz"
 
-#. module: google_gmail
-#: model:ir.model.fields.selection,name:google_gmail.selection__res_users__outgoing_mail_server_type__gmail
+# model:
+# model:ir.model.fields.selection,name:google_gmail.selection__res_users__outgoing_mail_server_type__gmail
+#, []
 msgid "Gmail"
-msgstr ""
+msgstr "Gmail"
 
-#. module: google_gmail
-#: model:ir.model.fields,field_description:google_gmail.field_res_config_settings__google_gmail_client_identifier
+# model:
+# model:ir.model.fields,field_description:google_gmail.field_res_config_settings__google_gmail_client_identifier
+#, []
 msgid "Gmail Client Id"
-msgstr ""
+msgstr "Gmail klijent ID"
 
-#. module: google_gmail
-#: model:ir.model.fields,field_description:google_gmail.field_res_config_settings__google_gmail_client_secret
+# model:
+# model:ir.model.fields,field_description:google_gmail.field_res_config_settings__google_gmail_client_secret
+#, []
 msgid "Gmail Client Secret"
-msgstr ""
+msgstr "Gmail klijent tajna"
 
-#. module: google_gmail
-#: model:ir.model.fields.selection,name:google_gmail.selection__fetchmail_server__server_type__gmail
-#: model:ir.model.fields.selection,name:google_gmail.selection__ir_mail_server__smtp_authentication__gmail
+# model:
+# model:ir.model.fields.selection,name:google_gmail.selection__fetchmail_server__server_type__gmail
+#, []
 msgid "Gmail OAuth Authentication"
-msgstr ""
+msgstr "Gmail OAuth autentifikacija"
 
-#. module: google_gmail
-#: model_terms:ir.ui.view,arch_db:google_gmail.google_gmail_oauth_error
+# model: model_terms:ir.ui.view,arch_db:google_gmail.google_gmail_oauth_error
+#, []
 msgid "Go back"
-msgstr ""
+msgstr "Nazad"
 
-#. module: google_gmail
-#: model:ir.model,name:google_gmail.model_google_gmail_mixin
+# model: model:ir.model,name:google_gmail.model_google_gmail_mixin
+#, []
 msgid "Google Gmail Mixin"
-msgstr ""
+msgstr "Google Gmail mixin"
 
-#. module: google_gmail
-#: model:ir.model.fields,field_description:google_gmail.field_fetchmail_server__id
-#: model:ir.model.fields,field_description:google_gmail.field_google_gmail_mixin__id
-#: model:ir.model.fields,field_description:google_gmail.field_ir_mail_server__id
-#: model:ir.model.fields,field_description:google_gmail.field_res_config_settings__id
-#: model:ir.model.fields,field_description:google_gmail.field_res_users__id
-#: model_terms:ir.ui.view,arch_db:google_gmail.res_config_settings_view_form
+# model:
+# model:ir.model.fields,field_description:google_gmail.field_fetchmail_server__id
+#, []
 msgid "ID"
-msgstr ""
+msgstr "ID"
 
-#. module: google_gmail
-#: model_terms:ir.ui.view,arch_db:google_gmail.res_config_settings_view_form
+# model:
+# model_terms:ir.ui.view,arch_db:google_gmail.res_config_settings_view_form
+#, []
 msgid "ID of your Google app"
-msgstr ""
+msgstr "ID vaše Google aplikacije"
 
-#. module: google_gmail
-#: model:ir.model,name:google_gmail.model_fetchmail_server
+# model: model:ir.model,name:google_gmail.model_fetchmail_server
+#, []
 msgid "Incoming Mail Server"
-msgstr ""
+msgstr "Poslužitelj dolaznih poruka"
 
-#. module: google_gmail
-#. odoo-python
-#: code:addons/google_gmail/models/ir_mail_server.py:0
+# model: code:addons/google_gmail/models/ir_mail_server.py
+#, []
 msgid ""
 "Incorrect Connection Security for Gmail mail server “%s”. Please set it to "
 "\"TLS (STARTTLS)\"."
 msgstr ""
+"Neispravna sigurnost konekcije za Gmail mail server “%s”. Molimo postavite "
+"na \"TLS (STARTTLS)\"."
 
-#. module: google_gmail
-#: model:ir.model,name:google_gmail.model_ir_mail_server
+# model: model:ir.model,name:google_gmail.model_ir_mail_server
+#, []
 msgid "Mail Server"
-msgstr ""
+msgstr "Mail server"
 
-#. module: google_gmail
-#. odoo-python
-#: code:addons/google_gmail/models/google_gmail_mixin.py:0
+# model: code:addons/google_gmail/models/google_gmail_mixin.py
+#, []
 msgid "Only the administrator can link a Gmail mail server."
-msgstr ""
+msgstr "Samo administrator može povezati Gmail mail server."
 
-#. module: google_gmail
-#. odoo-python
-#: code:addons/google_gmail/models/google_gmail_mixin.py:0
+# model: code:addons/google_gmail/models/google_gmail_mixin.py
+#, []
 msgid "Oops, we could not authenticate you. Please try again later."
-msgstr ""
+msgstr "Ups, nismo vas mogli autentikovati. Molimo pokušajte ponovo kasnije."
 
-#. module: google_gmail
-#. odoo-python
-#: code:addons/google_gmail/controllers/main.py:0
+# model: code:addons/google_gmail/controllers/main.py
+#, []
 msgid ""
-"Oops, you're creating an authorization to send from %(email_login)s but your "
-"address is %(email_server)s. Make sure your addresses match!"
+"Oops, you're creating an authorization to send from %(email_login)s but your"
+" address is %(email_server)s. Make sure your addresses match!"
 msgstr ""
+"Ups, kreirate autorizaciju za slanje sa %(email_login)s ali vaša adresa je "
+"%(email_server)s. Provjerite da li se adrese poklapaju!"
 
-#. module: google_gmail
-#: model:ir.model.fields,field_description:google_gmail.field_res_users__outgoing_mail_server_type
+# model:
+# model:ir.model.fields,field_description:google_gmail.field_res_users__outgoing_mail_server_type
+#, []
 msgid "Outgoing Mail Server Type"
-msgstr ""
+msgstr "Tip odlaznog mail servera"
 
-#. module: google_gmail
-#. odoo-python
-#: code:addons/google_gmail/models/google_gmail_mixin.py:0
+# model: code:addons/google_gmail/models/google_gmail_mixin.py
+#, []
 msgid "Please configure your Gmail credentials."
-msgstr ""
+msgstr "Molimo konfigurirajte vaše Gmail vjerodajnice."
 
-#. module: google_gmail
-#. odoo-python
-#: code:addons/google_gmail/models/google_gmail_mixin.py:0
+# model: code:addons/google_gmail/models/google_gmail_mixin.py
+#, []
 msgid "Please enter a valid email address."
-msgstr ""
+msgstr "Unesite ispravnu email adresu."
 
-#. module: google_gmail
-#. odoo-python
-#: code:addons/google_gmail/models/ir_mail_server.py:0
+# model: code:addons/google_gmail/models/ir_mail_server.py
+#, []
 msgid ""
 "Please fill the \"Username\" field with your Gmail username (your email "
 "address). This should be the same account as the one used for the Gmail "
 "OAuthentication Token."
 msgstr ""
+"Molimo ispunite polje \"Korisničko ime\" s vašim Gmail korisničkim imenom "
+"(vašom email adresom). To treba biti isti račun kao onaj korišten za Gmail "
+"OAuth token."
 
-#. module: google_gmail
-#. odoo-python
-#: code:addons/google_gmail/models/ir_mail_server.py:0
+# model: code:addons/google_gmail/models/ir_mail_server.py
+#, []
 msgid ""
 "Please leave the password field empty for Gmail mail server “%s”. The OAuth "
 "process does not require it"
 msgstr ""
+"Molimo ostavite polje lozinke prazno za Gmail mail server “%s”. OAuth proces"
+" to ne zahtijeva"
 
-#. module: google_gmail
-#: model_terms:ir.ui.view,arch_db:google_gmail.ir_mail_server_view_form
+# model: model_terms:ir.ui.view,arch_db:google_gmail.ir_mail_server_view_form
+#, []
 msgid "Read More"
-msgstr ""
+msgstr "Pročitaj više"
 
-#. module: google_gmail
-#: model:ir.model.fields,field_description:google_gmail.field_fetchmail_server__google_gmail_refresh_token
-#: model:ir.model.fields,field_description:google_gmail.field_google_gmail_mixin__google_gmail_refresh_token
-#: model:ir.model.fields,field_description:google_gmail.field_ir_mail_server__google_gmail_refresh_token
+# model:
+# model:ir.model.fields,field_description:google_gmail.field_fetchmail_server__google_gmail_refresh_token
+#, []
 msgid "Refresh Token"
-msgstr ""
+msgstr "Osvježi token"
 
-#. module: google_gmail
-#. odoo-python
-#: code:addons/google_gmail/models/fetchmail_server.py:0
+# model: code:addons/google_gmail/models/fetchmail_server.py
+#, []
 msgid "SSL is required for server “%s”."
-msgstr ""
+msgstr "SSL je obavezan za server “%s”."
 
-#. module: google_gmail
-#: model_terms:ir.ui.view,arch_db:google_gmail.res_config_settings_view_form
+# model:
+# model_terms:ir.ui.view,arch_db:google_gmail.res_config_settings_view_form
+#, []
 msgid "Secret"
-msgstr ""
+msgstr "Tajna"
 
-#. module: google_gmail
-#: model_terms:ir.ui.view,arch_db:google_gmail.res_config_settings_view_form
+# model:
+# model_terms:ir.ui.view,arch_db:google_gmail.res_config_settings_view_form
+#, []
 msgid "Secret of your Google app"
-msgstr ""
+msgstr "Tajna vaše Google aplikacije"
 
-#. module: google_gmail
-#: model:ir.model.fields,field_description:google_gmail.field_fetchmail_server__server_type
+# model:
+# model:ir.model.fields,field_description:google_gmail.field_fetchmail_server__server_type
+#, []
 msgid "Server Type"
-msgstr ""
+msgstr "Tip poslužitelja"
 
-#. module: google_gmail
-#. odoo-python
-#: code:addons/google_gmail/tools.py:0
+# model: code:addons/google_gmail/tools.py
+#, []
 msgid "Something went wrong. Try again later"
-msgstr ""
+msgstr "Nešto je pošlo po zlu. Pokušajte ponovo kasnije"
 
-#. module: google_gmail
-#: model:ir.model.fields,help:google_gmail.field_fetchmail_server__google_gmail_uri
-#: model:ir.model.fields,help:google_gmail.field_google_gmail_mixin__google_gmail_uri
-#: model:ir.model.fields,help:google_gmail.field_ir_mail_server__google_gmail_uri
+# model:
+# model:ir.model.fields,help:google_gmail.field_fetchmail_server__google_gmail_uri
+#, []
 msgid "The URL to generate the authorization code from Google"
-msgstr ""
+msgstr "URL za generiranje autorizacijskog koda sa Googla"
 
-#. module: google_gmail
-#: model:ir.model.fields,field_description:google_gmail.field_fetchmail_server__google_gmail_uri
-#: model:ir.model.fields,field_description:google_gmail.field_google_gmail_mixin__google_gmail_uri
-#: model:ir.model.fields,field_description:google_gmail.field_ir_mail_server__google_gmail_uri
+# model:
+# model:ir.model.fields,field_description:google_gmail.field_fetchmail_server__google_gmail_uri
+#, []
 msgid "URI"
-msgstr ""
+msgstr "URL"
 
-#. module: google_gmail
-#: model:ir.model,name:google_gmail.model_res_users
+# model: model:ir.model,name:google_gmail.model_res_users
+#, []
 msgid "User"
-msgstr ""
+msgstr "Korisnik"
 
-#. module: google_gmail
-#. odoo-python
-#: code:addons/google_gmail/tools.py:0
+# model: code:addons/google_gmail/tools.py
+#, []
 msgid "You don't have an active subscription"
-msgstr ""
+msgstr "Nemate aktivnu pretplatu"
