@@ -73,7 +73,7 @@ msgstr "URI za provjeru autentičnosti"
 #. module: microsoft_outlook
 #: model:ir.model,name:microsoft_outlook.model_res_config_settings
 msgid "Config Settings"
-msgstr "Postavke"
+msgstr "Postavke konfiguracije"
 
 #. module: microsoft_outlook
 #. odoo-python

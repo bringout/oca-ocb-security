@@ -409,3 +409,33 @@ msgstr "Vaš kod za dvofaktorsku autentikaciju"
 #: model_terms:ir.ui.view,arch_db:auth_totp_mail.account_security_alert
 msgid "activating Two-factor Authentication"
 msgstr "aktiviranje dvofaktorske autentikacije"
+
+#. module: auth_totp_mail
+#: code:addons/auth_totp_mail/static/src/services/check_identity/check_identity.xml:0
+msgid "Authentication code via email"
+msgstr ""
+
+#. module: auth_totp_mail
+#: code:addons/auth_totp_mail/static/src/services/check_identity/check_identity.xml:0
+msgid "Enter below the six-digit authentication code just sent to your email"
+msgstr ""
+
+#. module: auth_totp_mail
+#: model:ir.model,name:auth_totp_mail.model_ir_http
+msgid "HTTP Routing"
+msgstr ""
+
+#. module: auth_totp_mail
+#: code:addons/auth_totp_mail/static/src/services/check_identity/check_identity.xml:0
+msgid "Use an authentication code sent by email"
+msgstr ""
+
+#. module: auth_totp_mail
+#: code:addons/auth_totp_mail/static/src/services/check_identity/check_identity.xml:0
+msgid "Verify"
+msgstr ""
+
+#. module: auth_totp_mail
+#: code:addons/auth_totp_mail/static/src/services/check_identity/check_identity.xml:0
+msgid "XXXXXX"
+msgstr ""
