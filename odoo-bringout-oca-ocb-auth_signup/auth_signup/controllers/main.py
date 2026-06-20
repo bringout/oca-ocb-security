@@ -43,7 +43,15 @@ class AuthSignupHome(Home):
             try:
                 if not request.env['ir.http']._verify_request_recaptcha_token('signup'):
                     raise UserError(_("Suspicious activity detected by Google reCaptcha."))
+
                 self.do_signup(qcontext)
+
+                # Set user to public if they were not signed in by do_signup
+                # (mfa enabled)
+                if request.session.uid is None:
+                    public_user = request.env.ref('base.public_user')
+                    request.update_env(user=public_user)
+
                 # Send an account creation confirmation email
                 User = request.env['res.users']
                 user_sudo = User.sudo().search(
@@ -59,8 +67,8 @@ class AuthSignupHome(Home):
                 if request.env["res.users"].sudo().search([("login", "=", qcontext.get("login"))]):
                     qcontext["error"] = _("Another user is already registered using this email address.")
                 else:
-                    _logger.error("%s", e)
-                    qcontext['error'] = _("Could not create a new account.")
+                    _logger.warning("%s", e)
+                    qcontext['error'] = _("Could not create a new account.") + "\n" + str(e)
 
         elif 'signup_email' in qcontext:
             user = request.env['res.users'].sudo().search([('email', '=', qcontext.get('signup_email')), ('state', '!=', 'new')], limit=1)
@@ -165,7 +173,7 @@ class AuthSignupHome(Home):
             raise SignupError(_('Authentication Failed.'))
 
 class AuthBaseSetup(BaseSetup):
-    @http.route('/base_setup/data', type='json', auth='user')
+    @http.route()
     def base_setup_data(self, **kwargs):
         res = super().base_setup_data(**kwargs)
         res.update({'resend_invitation': True})

@@ -1,8 +1,8 @@
-odoo.define('auth_totp.tours', function(require) {
-"use strict";
+/** @odoo-module **/
 
-const tour = require('web_tour.tour');
-const ajax = require('web.ajax');
+import { jsonrpc } from "@web/core/network/rpc_service";
+import { registry } from "@web/core/registry";
+import { stepUtils } from "@web_tour/tour_service/tour_utils";
 
 function openRoot() {
     return [{
@@ -21,7 +21,7 @@ function openRoot() {
 function openUserProfileAtSecurityTab() {
     return [{
         content: 'Open user account menu',
-        trigger: '.o_user_menu .oe_topbar_name',
+        trigger: '.o_user_menu .dropdown-toggle',
         run: 'click',
     }, {
         content: "Open preferences / profile screen",
@@ -54,7 +54,7 @@ function closeProfileDialog({content, totp_state}) {
         content,
         trigger,
         run() {
-            const $modal = this.$anchor.parents('.o_dialog_container');
+            const $modal = this.$anchor.parents('.o_dialog');
             if ($modal.length) {
                 $modal.find('button[name=preference_cancel]').click()
             }
@@ -62,7 +62,7 @@ function closeProfileDialog({content, totp_state}) {
     }, {
         trigger: 'body',
         async run() {
-            while (document.querySelector('.o_dialog_container .o_dialog')) {
+            while (document.querySelector('.o_dialog')) {
                 await Promise.resolve();
             }
             this.$anchor.addClass('dialog-closed');
@@ -73,17 +73,17 @@ function closeProfileDialog({content, totp_state}) {
     }];
 }
 
-tour.register('totp_tour_setup', {
+registry.category("web_tour.tours").add('totp_tour_setup', {
     test: true,
-    url: '/web'
-}, [...openUserProfileAtSecurityTab(), {
+    url: '/web',
+    steps: () => [...openUserProfileAtSecurityTab(), {
     content: "Open totp wizard",
     trigger: 'button[name=action_totp_enable_wizard]',
 }, {
     content: "Check that we have to enter enhanced security mode and input password",
     extra_trigger: 'div:contains("enter your password")',
     trigger: '[name=password] input',
-    run: 'text demo',
+    run: 'text test_user',
 }, {
     content: "Confirm",
     trigger: "button:contains(Confirm Password)",
@@ -98,7 +98,7 @@ tour.register('totp_tour_setup', {
         const $secret = this.$anchor.closest('div').find('[name=secret] span:first-child');
         const $copyBtn = $secret.find('button');
         $copyBtn.remove();
-        const token = await ajax.jsonRpc('/totphook', 'call', {
+        const token = await jsonrpc('/totphook', {
             secret: $secret.text()
         });
         helpers.text(token, '[name=code] input');
@@ -116,22 +116,22 @@ tour.register('totp_tour_setup', {
     content: "Check that the button has changed",
     totp_state: true,
 }),
-]);
+]});
 
-tour.register('totp_login_enabled', {
+registry.category("web_tour.tours").add('totp_login_enabled', {
     test: true,
-    url: '/'
-}, [{
+    url: '/',
+    steps: () => [{
     content: "check that we're on the login page or go to it",
     trigger: 'input#login, a:contains(Sign in)'
 }, {
     content: "input login",
     trigger: 'input#login',
-    run: 'text demo',
+    run: 'text test_user',
 }, {
     content: 'input password',
     trigger: 'input#password',
-    run: 'text demo',
+    run: 'text test_user',
 }, {
     content: "click da button",
     trigger: 'button:contains("Log in")',
@@ -148,30 +148,30 @@ tour.register('totp_login_enabled', {
         //       content of the HTML element, not the JS value property. We
         //       could set a class but that's really no better than
         //       procedurally clicking the button after we've set the input.
-        const token = await ajax.jsonRpc('/totphook', 'call', {});
+        const token = await jsonrpc('/totphook');
         helpers.text(token);
         helpers.click('button:contains("Log in")');
     }
 }, {
     content: "check we're logged in",
-    trigger: ".o_user_menu .oe_topbar_name",
+    trigger: ".o_user_menu .dropdown-toggle",
     run() {}
-}]);
+}]});
 
-tour.register('totp_login_device', {
+registry.category("web_tour.tours").add('totp_login_device', {
     test: true,
-    url: '/'
-}, [{
+    url: '/',
+    steps: () => [{
     content: "check that we're on the login page or go to it",
     trigger: 'input#login, a:contains(Sign in)'
 }, {
     content: "input login",
     trigger: 'input#login',
-    run: 'text demo',
+    run: 'text test_user',
 }, {
     content: 'input password',
     trigger: 'input#password',
-    run: 'text demo',
+    run: 'text test_user',
 }, {
     content: "click da button",
     trigger: 'button:contains("Log in")',
@@ -185,13 +185,13 @@ tour.register('totp_login_device', {
     content: "input code",
     trigger: 'input[name=totp_token]',
     async run(helpers) {
-        const token = await ajax.jsonRpc('/totphook', 'call', {})
+        const token = await jsonrpc('/totphook')
         helpers.text(token);
         helpers.click('button:contains("Log in")');
     }
 }, {
     content: "check we're logged in",
-    trigger: ".o_user_menu .oe_topbar_name",
+    trigger: ".o_user_menu .dropdown-toggle",
     run: 'click',
 }, {
     content: "click the Log out button",
@@ -202,17 +202,17 @@ tour.register('totp_login_device', {
 }, {
     content: "input login again",
     trigger: 'input#login',
-    run: 'text demo',
+    run: 'text test_user',
 }, {
     content: 'input password again',
     trigger: 'input#password',
-    run: 'text demo',
+    run: 'text test_user',
 }, {
     content: "click da button again",
     trigger: 'button:contains("Log in")',
 },  {
     content: "check we're logged in without 2FA",
-    trigger: ".o_user_menu .oe_topbar_name",
+    trigger: ".o_user_menu .dropdown-toggle",
     run() {}
 },
 // now go and disable two-factor authentication would be annoying to do in a separate tour
@@ -226,7 +226,7 @@ tour.register('totp_login_device', {
     content: "Check that we have to enter enhanced security mode and input password",
     extra_trigger: 'div:contains("enter your password")',
     trigger: '[name=password] input',
-    run: 'text demo',
+    run: 'text test_user',
 }, {
     content: "Confirm",
     trigger: "button:contains(Confirm Password)",
@@ -237,22 +237,22 @@ tour.register('totp_login_device', {
     content: "Check that the button has changed",
     totp_state: false
 }),
-]);
+]});
 
-tour.register('totp_login_disabled', {
+registry.category("web_tour.tours").add('totp_login_disabled', {
     test: true,
-    url: '/'
-}, [{
+    url: '/',
+    steps: () => [{
     content: "check that we're on the login page or go to it",
     trigger: 'input#login, a:contains(Sign in)'
 }, {
     content: "input login",
     trigger: 'input#login',
-    run: 'text demo',
+    run: 'text test_user',
 }, {
     content: 'input password',
     trigger: 'input#password',
-    run: 'text demo',
+    run: 'text test_user',
 }, {
     content: "click da button",
     trigger: 'button:contains("Log in")',
@@ -264,13 +264,13 @@ tour.register('totp_login_disabled', {
 ...openUserProfileAtSecurityTab(),
 // close the dialog if that makes sense
 ...closeProfileDialog({})
-]);
+]});
 
 const columns = {};
-tour.register('totp_admin_disables', {
+registry.category("web_tour.tours").add('totp_admin_disables', {
     test: true,
-    url: '/web'
-}, [tour.stepUtils.showAppsMenuItem(), {
+    url: '/web',
+    steps: () => [stepUtils.showAppsMenuItem(), {
     content: 'Go to settings',
     trigger: '[data-menu-xmlid="base.menu_administration"]'
 }, {
@@ -300,8 +300,8 @@ tour.register('totp_admin_disables', {
         }
     }
 }, {
-    content: "Find Demo User",
-    trigger: 'td.o_data_cell:contains("demo")',
+    content: "Find test_user User",
+    trigger: 'td.o_data_cell:contains("test_user")',
     run(helpers) {
         const $titles = this.$anchor.closest('table').find('tr:first th');
         for (let i=0; i<$titles.length; ++i) {
@@ -327,13 +327,18 @@ tour.register('totp_admin_disables', {
     trigger: "button:contains(Confirm Password)",
 }, {
     content: "open the user's form",
-    trigger: "td.o_data_cell:contains(demo)",
+    trigger: "td.o_data_cell:contains(test_user)",
 }, {
     content: "go to Account security Tab",
     trigger: "a.nav-link:contains(Account Security)",
-}, ...closeProfileDialog({
-    content: "check that demo user has been de-totp'd",
-    totp_state: false,
-}),
-])
-});
+}, {
+    content: "check 2FA button",
+    trigger: 'body',
+    run: () => {
+        const button = document.querySelector('button[name=action_totp_enable_wizard]').disabled
+        if (!button) {
+            console.error("2FA button should be disabled.");
+        }
+    },
+}
+]})

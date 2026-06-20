@@ -9,7 +9,6 @@ from dateutil.parser import parse
 from datetime import timedelta
 
 from odoo import api, fields, models, registry
-from odoo.tools import ormcache_context
 from odoo.exceptions import UserError
 from odoo.osv import expression
 from odoo.sql_db import BaseCursor
@@ -79,24 +78,25 @@ class MicrosoftSync(models.AbstractModel):
     active = fields.Boolean(default=True)
 
     def write(self, vals):
-        if 'ms_universal_event_id' in vals:
-            self._from_uids.clear_cache(self)
-
-        fields_to_sync = [x for x in vals.keys() if x in self._get_microsoft_synced_fields()]
-        if fields_to_sync and 'need_sync_m' not in vals and not self.env.user.microsoft_synchronization_stopped:
+        fields_to_sync = [x for x in vals if x in self._get_microsoft_synced_fields()]
+        if fields_to_sync and 'need_sync_m' not in vals and self.env.user._get_microsoft_sync_status() == "sync_active":
             vals['need_sync_m'] = True
 
         result = super().write(vals)
 
-        for record in self.filtered(lambda e: e.need_sync_m and e.ms_organizer_event_id):
-            if not vals.get('active', True):
-                # We need to delete the event. Cancel is not sufficant. Errors may occurs
-                record._microsoft_delete(record._get_organizer(), record.ms_organizer_event_id, timeout=3)
-            elif fields_to_sync:
-                values = record._microsoft_values(fields_to_sync)
-                if not values:
-                    continue
-                record._microsoft_patch(record._get_organizer(), record.ms_organizer_event_id, values, timeout=3)
+        if self.env.user._get_microsoft_sync_status() != "sync_paused":
+            timeout = self._get_microsoft_graph_timeout()
+
+            for record in self:
+                if record.need_sync_m and record.ms_organizer_event_id:
+                    if not vals.get('active', True):
+                        # We need to delete the event. Cancel is not sufficient. Errors may occur.
+                        record._microsoft_delete(record._get_organizer(), record.ms_organizer_event_id, timeout=timeout)
+                    elif fields_to_sync:
+                        values = record._microsoft_values(fields_to_sync)
+                        if not values:
+                            continue
+                        record._microsoft_patch(record._get_organizer(), record.ms_organizer_event_id, values, timeout=timeout)
 
         return result
 
@@ -107,9 +107,12 @@ class MicrosoftSync(models.AbstractModel):
                 vals.update({'need_sync_m': False})
         records = super().create(vals_list)
 
-        records_to_sync = records.filtered(lambda r: r.need_sync_m and r.active)
-        for record in records_to_sync:
-            record._microsoft_insert(record._microsoft_values(self._get_microsoft_synced_fields()), timeout=3)
+        if self.env.user._get_microsoft_sync_status() != "sync_paused":
+            timeout = self._get_microsoft_graph_timeout()
+
+            for record in records:
+                if record.need_sync_m and record.active:
+                    record._microsoft_insert(record._microsoft_values(self._get_microsoft_synced_fields()), timeout=timeout)
         return records
 
     @api.depends('microsoft_id')
@@ -166,8 +169,9 @@ class MicrosoftSync(models.AbstractModel):
 
     def unlink(self):
         synced = self._get_synced_events()
-        for ev in synced:
-            ev._microsoft_delete(ev._get_organizer(), ev.ms_organizer_event_id)
+        if self.env.user._get_microsoft_sync_status() != "sync_paused":
+            for ev in synced:
+                ev._microsoft_delete(ev._get_organizer(), ev.ms_organizer_event_id)
         return super().unlink()
 
     def _write_from_microsoft(self, microsoft_event, vals):
@@ -176,13 +180,6 @@ class MicrosoftSync(models.AbstractModel):
     @api.model
     def _create_from_microsoft(self, microsoft_event, vals_list):
         return self.with_context(dont_notify=True).create(vals_list)
-
-    @api.model
-    @ormcache_context('uids', keys=('active_test',))
-    def _from_uids(self, uids):
-        if not uids:
-            return self.browse()
-        return self.search([('ms_universal_event_id', 'in', uids)])
 
     def _sync_odoo2microsoft(self):
         if not self:
@@ -201,6 +198,11 @@ class MicrosoftSync(models.AbstractModel):
             record._microsoft_delete(record._get_organizer(), record.ms_organizer_event_id)
         for record in new_records:
             values = record._microsoft_values(self._get_microsoft_synced_fields())
+            sender_user = record._get_event_user_m()
+            # Prevent current user to synchronize new events of non-synchronized users, otherwise the event
+            # ownership will be lost in Outlook and it will block the future event sync for the original owner.
+            if record.user_id and record.user_id != self.env.user and sender_user == self.env.user:
+                continue
             if isinstance(values, dict):
                 record._microsoft_insert(values)
             else:
@@ -518,6 +520,18 @@ class MicrosoftSync(models.AbstractModel):
         """
         raise NotImplementedError()
 
+    @api.model
+    def _get_microsoft_graph_timeout(self):
+        """Return Microsoft Graph request timeout (seconds).
+
+        Keep current behavior by default (5s), but allow admins to increase it
+        through a system parameter.
+        """
+        timeout = self.env['ir.config_parameter'].sudo().get_param('microsoft_calendar.graph_timeout')
+        if not timeout or not timeout.isdigit():
+            return 5
+        return max(1, int(timeout))
+
     def _microsoft_values(self, fields_to_sync):
         """
         Implements this method to return a dict with values formatted
@@ -563,6 +577,10 @@ class MicrosoftSync(models.AbstractModel):
                 '&', ('ms_universal_event_id', '=', False), is_active_clause,
                 ('need_sync_m', '=', True),
             ]])
+        # Sync only events created/updated after last sync date (with 5 min of time acceptance).
+        if self.env.user.microsoft_last_sync_date:
+            time_offset = timedelta(minutes=5)
+            domain = expression.AND([domain, [('write_date', '>=', self.env.user.microsoft_last_sync_date - time_offset)]])
         return domain
 
     def _get_event_user_m(self, user_id=None):

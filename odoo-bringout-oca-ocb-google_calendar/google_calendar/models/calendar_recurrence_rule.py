@@ -96,22 +96,29 @@ class RecurrenceRule(models.Model):
         emails = [a.get('email') for a in google_attendees]
         partners = self._get_sync_partner(emails)
         existing_attendees = self.calendar_event_ids.attendee_ids
-        for attendee in zip(emails, partners, google_attendees):
-            email = attendee[0]
-            if email in existing_attendees.mapped('email'):
+        partners_by_email = {(p.email_normalized or p.email): p for p in partners}
+        for google_attendee in google_attendees:
+            attendee_email = google_attendee.get('email')
+            attendee_email_normalized = email_normalize(attendee_email)
+            if attendee_email in existing_attendees.mapped('email'):
                 # Update existing attendees
-                existing_attendees.filtered(lambda att: att.email == email).write({'state': attendee[2].get('responseStatus')})
+                existing_attendees.filtered(lambda att: att.email == attendee_email).write({'state': google_attendee.get('responseStatus')})
             else:
                 # Create new attendees
-                if attendee[2].get('self'):
+                if google_attendee.get('self'):
                     partner = self.env.user.partner_id
-                elif attendee[1]:
-                    partner = attendee[1]
+                elif partners_by_email.get(attendee_email_normalized):
+                    partner = partners_by_email[attendee_email_normalized]
+                elif partners_by_email.get(attendee_email):
+                    partner = partners_by_email[attendee_email]
                 else:
                     continue
-                self.calendar_event_ids.write({'attendee_ids': [(0, 0, {'state': attendee[2].get('responseStatus'), 'partner_id': partner.id})]})
-                if attendee[2].get('displayName') and not partner.name:
-                    partner.name = attendee[2].get('displayName')
+                self.calendar_event_ids.write({
+                    'attendee_ids': [(0, 0, {'state': google_attendee.get('responseStatus'), 'partner_id': partner.id})],
+                    'need_sync': False,
+                })
+                if google_attendee.get('displayName') and not partner.name:
+                    partner.name = google_attendee.get('displayName')
 
         organizers_partner_ids = [event.user_id.partner_id for event in self.calendar_event_ids if event.user_id]
         for odoo_attendee_email in set(existing_attendees.mapped('email')):
@@ -121,7 +128,7 @@ class RecurrenceRule(models.Model):
                 self.calendar_event_ids.write({'need_sync': False, 'partner_ids': [Command.unlink(att.partner_id.id) for att in attendees]})
 
         old_event_values = self.base_event_id and self.base_event_id.read(base_event_time_fields)[0]
-        if old_event_values and any(new_event_values[key] != old_event_values[key] for key in base_event_time_fields):
+        if old_event_values and any(new_event_values.get(key) and new_event_values[key] != old_event_values[key] for key in base_event_time_fields):
             # we need to recreate the recurrence, time_fields were modified.
             base_event_id = self.base_event_id
             non_equal_values = [

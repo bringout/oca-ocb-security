@@ -1,26 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* auth_totp_portal
-# 
+#
 # Translators:
-# abc Def <hdogan1974@gmail.com>, 2022
-# Nadir Gazioglu <nadirgazioglu@gmail.com>, 2022
-# Ediz Duman <neps1192@gmail.com>, 2022
-# Ertuğrul Güreş <ertugrulg@projetgrup.com>, 2022
-# Murat Kaplan <muratk@projetgrup.com>, 2022
-# 
+# Ediz Duman <neps1192@gmail.com>, 2023
+# Murat Kaplan <muratk@projetgrup.com>, 2023
+# Ertuğrul Güreş <ertugrulg@projetgrup.com>, 2023
+# abc Def <hdogan1974@gmail.com>, 2023
+# Doğan Altunbay <doganaltunbay@gmail.com>, 2023
+# Nadir Gazioglu <nadirgazioglu@gmail.com>, 2023
+# sinem cil, 2024
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0\n"
+"Project-Id-Version: Odoo Server 17.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-06 13:31+0000\n"
-"PO-Revision-Date: 2022-09-22 05:45+0000\n"
-"Last-Translator: Murat Kaplan <muratk@projetgrup.com>, 2022\n"
+"POT-Creation-Date: 2026-03-06 18:38+0000\n"
+"PO-Revision-Date: 2023-10-26 23:09+0000\n"
+"Last-Translator: sinem cil, 2024\n"
 "Language-Team: Turkish (https://app.transifex.com/odoo/teams/41243/tr/)\n"
+"Language: tr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: tr\n"
 "Plural-Forms: nplurals=2; plural=(n > 1);\n"
 
 #. module: auth_totp_portal
@@ -46,8 +48,10 @@ msgstr ""
 
 #. module: auth_totp_portal
 #: model_terms:ir.ui.view,arch_db:auth_totp_portal.totp_portal_hook
-msgid "<i title=\"Documentation\" class=\"fa fa-fw o_button_icon fa-info-circle\"/>"
-msgstr "<i title=\"Documentation\" class=\"fa fa-fw o_button_icon fa-info-circle\"/>"
+msgid ""
+"<i title=\"Documentation\" class=\"fa fa-fw o_button_icon fa-info-circle\"/>"
+msgstr ""
+"<i title=\"Documentation\" class=\"fa fa-fw o_button_icon fa-info-circle\"/>"
 
 #. module: auth_totp_portal
 #: model_terms:ir.ui.view,arch_db:auth_totp_portal.totp_portal_hook
@@ -76,8 +80,15 @@ msgstr "<strong>Güvenilir Cihaz</strong>"
 #. odoo-javascript
 #: code:addons/auth_totp_portal/static/src/js/totp_frontend.js:0
 #, python-format
-msgid "Copied !"
-msgstr "Kopyalandı !"
+msgid "Activate"
+msgstr "Etkinleştir"
+
+#. module: auth_totp_portal
+#. odoo-javascript
+#: code:addons/auth_totp_portal/static/src/components/totp_confirmation_dialog.js:0
+#, python-format
+msgid "Copied!"
+msgstr "Kopyalandı!"
 
 #. module: auth_totp_portal
 #: model_terms:ir.ui.view,arch_db:auth_totp_portal.totp_portal_hook

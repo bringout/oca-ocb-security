@@ -4,10 +4,9 @@
 import logging
 import pytz
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
-from collections import defaultdict
 
 from odoo import api, fields, models, _
 from odoo.osv import expression
@@ -55,7 +54,14 @@ class Meeting(models.Model):
 
     @api.model
     def _restart_microsoft_sync(self):
-        self.env['calendar.event'].with_context(dont_notify=True).search(self._get_microsoft_sync_domain()).write({
+        domain = self._get_microsoft_sync_domain()
+
+        # Sync only events created/updated after last sync date (with 5 min of time acceptance).
+        if self.env.user.microsoft_last_sync_date:
+            time_offset = timedelta(minutes=5)
+            domain = expression.AND([domain, [('write_date', '>=', self.env.user.microsoft_last_sync_date - time_offset)]])
+
+        self.env['calendar.event'].with_context(dont_notify=True).search(domain).write({
             'need_sync_m': True,
         })
 
@@ -76,7 +82,8 @@ class Meeting(models.Model):
         if self._check_microsoft_sync_status() and not notify_context and recurrency_in_batch:
             self._forbid_recurrence_creation()
 
-        for vals in vals_list:
+        vals_check_organizer = self._check_organizer_validation_conditions(vals_list)
+        for vals in [vals for vals, check_organizer in zip(vals_list, vals_check_organizer) if check_organizer]:
             # If event has a different organizer, check its sync status and verify if the user is listed as attendee.
             sender_user, partner_ids = self._get_organizer_user_change_info(vals)
             partner_included = partner_ids and len(partner_ids) > 0 and sender_user.partner_id.id in partner_ids
@@ -163,11 +170,18 @@ class Meeting(models.Model):
         notify_context = self.env.context.get('dont_notify', False)
 
         # Forbid recurrence updates through Odoo and suggest user to update it in Outlook.
-        if self._check_microsoft_sync_status():
+        if not notify_context:
             recurrency_in_batch = self.filtered(lambda ev: ev.recurrency)
             recurrence_update_attempt = recurrence_update_setting or 'recurrency' in values or recurrency_in_batch and len(recurrency_in_batch) > 0
-            if not notify_context and recurrence_update_attempt and not 'active' in values:
-                self._forbid_recurrence_update()
+            # Check if this is an Outlook recurring event with active sync
+            if recurrence_update_attempt and 'active' not in values:
+                recurring_events = self.filtered('microsoft_recurrence_master_id')
+                if recurring_events and any(
+                    event.with_user(organizer)._check_microsoft_sync_status()
+                    for event in recurring_events
+                    if (organizer := event._get_organizer())
+                ):
+                    self._forbid_recurrence_update()
 
         # When changing the organizer, check its sync status and verify if the user is listed as attendee.
         # Updates from Microsoft must skip this check since changing the organizer on their side is not possible.
@@ -178,19 +192,21 @@ class Meeting(models.Model):
                 sender_user, partner_ids = event._get_organizer_user_change_info(values)
                 partner_included = sender_user.partner_id in event.attendee_ids.partner_id or sender_user.partner_id.id in partner_ids
                 event._check_organizer_validation(sender_user, partner_included)
-                event._recreate_event_different_organizer(values, sender_user)
-                deactivated_events_ids.append(event.id)
+                if event.microsoft_id:
+                    event._recreate_event_different_organizer(values, sender_user)
+                    deactivated_events_ids.append(event.id)
 
         # check a Outlook limitation in overlapping the actual recurrence
         if recurrence_update_setting == 'self_only' and 'start' in values:
             self._check_recurrence_overlapping(values['start'])
 
         # if a single event becomes the base event of a recurrency, it should be first
-        # removed from the Outlook calendar.
-        if 'recurrency' in values and values['recurrency']:
-            for e in self.filtered(lambda e: not e.recurrency and not e.recurrence_id):
-                e._microsoft_delete(e._get_organizer(), e.ms_organizer_event_id, timeout=3)
-                e.microsoft_id = False
+        # removed from the Outlook calendar. Additionaly, checks if synchronization is not paused.
+        if self.env.user._get_microsoft_sync_status() != "sync_paused" and values.get('recurrency'):
+            for event in self:
+                if not event.recurrency and not event.recurrence_id:
+                    event._microsoft_delete(event._get_organizer(), event.ms_organizer_event_id, timeout=3)
+                    event.microsoft_id = False
 
         deactivated_events = self.browse(deactivated_events_ids)
         # Update attendee status before 'values' variable is overridden in super.
@@ -230,7 +246,9 @@ class Meeting(models.Model):
     @api.model
     def _get_organizer_user_change_info(self, values):
         """ Return the sender user of the event and the partner ids listed on the event values. """
-        sender_user_id = values.get('user_id', self.env.user.id)
+        sender_user_id = values.get('user_id')
+        if not sender_user_id:
+            sender_user_id = self.env.user.id
         sender_user = self.env['res.users'].browse(sender_user_id)
         attendee_values = self._attendees_values(values['partner_ids']) if 'partner_ids' in values else []
         partner_ids = []
@@ -646,6 +664,9 @@ class Meeting(models.Model):
         """
         user = self.env.user
         records = self.filtered(lambda e: not e.user_id or e.user_id == user or user.partner_id in e.partner_ids)
+        for event in records:
+            # remove the tracking data to avoid calling _track_template in the pre-commit phase
+            self.env.cr.precommit.data.pop(f'mail.tracking.create.{event._name}.{event.id}', None)
         super(Meeting, records)._cancel_microsoft()
         attendees = (self - records).attendee_ids.filtered(lambda a: a.partner_id == user.partner_id)
         attendees.do_decline()

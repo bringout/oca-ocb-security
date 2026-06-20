@@ -1326,6 +1326,27 @@ class TestUpdateEvents(TestCommon):
         # Assert that no patch call was made due to the recurrence update forbiddance.
         mock_patch.assert_not_called()
 
+    @patch.object(MicrosoftCalendarService, 'patch')
+    def test_update_synced_event_with_sync_config_paused(self, mock_patch):
+        """
+        Updates an event with the synchronization paused, the event must have its field 'need_sync_m' as True
+        for later synchronizing it with Outlook Calendar.
+        """
+        # Set user synchronization configuration as active and pause it.
+        self.organizer_user.microsoft_synchronization_stopped = False
+        self.organizer_user.pause_microsoft_synchronization()
+
+        # Try to update a simple event in Odoo Calendar.
+        self.simple_event.with_user(self.organizer_user).write({"name": "updated simple event"})
+        self.call_post_commit_hooks()
+        self.simple_event.invalidate_recordset()
+
+        # Ensure that synchronization is paused, delete wasn't called and record is waiting to be synced again.
+        self.assertFalse(self.organizer_user.microsoft_synchronization_stopped)
+        self.assertEqual(self.organizer_user._get_microsoft_sync_status(), "sync_paused")
+        self.assertTrue(self.simple_event.need_sync_m, "Sync variable must be true for updating event when sync re-activates")
+        mock_patch.assert_not_called()
+
     @patch.object(MicrosoftCalendarService, 'get_events')
     @patch.object(MicrosoftCalendarService, 'delete')
     @patch.object(MicrosoftCalendarService, 'insert')
@@ -1392,6 +1413,83 @@ class TestUpdateEvents(TestCommon):
         self.attendee_user.with_user(self.attendee_user).restart_microsoft_synchronization()
         self.organizer_user.with_user(self.organizer_user).restart_microsoft_synchronization()
         self.assertTrue(all(ev.need_sync_m for ev in self.recurrent_events))
+
+    @freeze_time('2021-09-22')
+    @patch.object(MicrosoftCalendarService, 'get_events')
+    def test_resync_recurrence_with_exception_base_event_preserves_microsoft_ids(self, mock_get_events):
+        """
+        When an attendee syncs a recurrence where the base event is an exception
+        (modified by the organizer), re-syncing the unchanged seriesMaster should NOT
+        trigger the destructive recreation path that clears all Microsoft IDs.
+
+        Scenario:
+        1. Attendee syncs a recurrence (seriesMaster + occurrences) — all events get Microsoft IDs
+        2. Organizer modifies the first occurrence's end time — it becomes an exception
+        3. Attendee syncs again (e.g. after accepting invitation) — the seriesMaster is unchanged
+           but the base event's time no longer matches the pattern → must NOT destroy other events
+        """
+        # ----------- Setup test data and check assumptions -----------
+
+        recurrence = self.recurrence
+        all_events = recurrence.calendar_event_ids.sorted(key=lambda r: r.start)
+        initial_event_count = len(all_events)
+        for event in all_events:
+            self.assertTrue(event.microsoft_id, "All events should have a microsoft_id before the test")
+            self.assertTrue(event.ms_universal_event_id, "All events should have a ms_universal_event_id before the test")
+
+        base_event = recurrence.base_event_id
+
+        # ----------- Sync exception -----------
+
+        # Make the first occurrence an exception with modified end time
+        new_end_time = (self.end_date - timedelta(minutes=30))
+        events = list(self.recurrent_event_from_outlook_organizer)
+        events[1] = dict(
+            events[1],
+            end={
+                'dateTime': new_end_time.strftime("%Y-%m-%dT%H:%M:%S.0000000"),
+                'timeZone': 'UTC',
+            },
+            type="exception",
+            lastModifiedDateTime=_modified_date_in_the_future(base_event),
+        )
+        events[0] = dict(
+            events[0],
+            lastModifiedDateTime=_modified_date_in_the_future(base_event),
+        )
+
+        mock_get_events.return_value = (MicrosoftEvent(events), None)
+        self.organizer_user.with_user(self.organizer_user).sudo()._sync_microsoft_calendar()
+
+        base_event.invalidate_recordset()
+        self.assertFalse(base_event.follow_recurrence, "Base event should be an exception (follow_recurrence=False)")
+        self.assertEqual(base_event.stop, new_end_time, "Base event end time should be updated")
+
+        # ----------- Re-sync unchanged seriesMaster -----------
+
+        # Same payload again. The base event is now an exception whose time doesn't
+        # match the pattern — this must NOT trigger the destructive recreation path.
+        self.organizer_user.with_user(self.organizer_user).sudo()._sync_microsoft_calendar()
+
+        recurrence.invalidate_recordset()
+        all_events_after = recurrence.calendar_event_ids.sorted(key=lambda r: r.start)
+
+        self.assertEqual(
+            len(all_events_after), initial_event_count,
+            "Event count should be preserved — no events should be deleted and recreated",
+        )
+
+        for event in all_events_after:
+            self.assertTrue(
+                event.microsoft_id,
+                f"Event {event.id} (start={event.start}) should still have a microsoft_id",
+            )
+            self.assertTrue(
+                event.ms_universal_event_id,
+                f"Event {event.id} (start={event.start}) should still have a ms_universal_event_id",
+            )
+
+        self.assertFalse(base_event.follow_recurrence, "Base event should remain an exception")
 
     @patch.object(MicrosoftSync, '_write_from_microsoft')
     @patch.object(MicrosoftCalendarService, 'get_events')
