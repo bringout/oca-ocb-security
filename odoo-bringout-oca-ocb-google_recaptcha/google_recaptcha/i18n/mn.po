@@ -1,28 +1,28 @@
 # Translation of Odoo Server.
 # This file contains the translation of the following modules:
 # 	* google_recaptcha
-# 
+#
 # Translators:
-# tserendavaa tsogtoo <tseegii011929@gmail.com>, 2022
-# Martin Trigaux, 2022
-# 
+# Martin Trigaux, 2024
+# tserendavaa tsogtoo <tseegii011929@gmail.com>, 2024
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: Odoo Server 16.0\n"
+"Project-Id-Version: Odoo Server 17.2alpha1\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2024-02-06 13:31+0000\n"
-"PO-Revision-Date: 2022-09-22 05:46+0000\n"
-"Last-Translator: Martin Trigaux, 2022\n"
+"POT-Creation-Date: 2025-12-29 18:37+0000\n"
+"PO-Revision-Date: 2024-09-25 09:41+0000\n"
+"Last-Translator: tserendavaa tsogtoo <tseegii011929@gmail.com>, 2024\n"
 "Language-Team: Mongolian (https://app.transifex.com/odoo/teams/41243/mn/)\n"
+"Language: mn\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: \n"
-"Language: mn\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. module: google_recaptcha
 #: model_terms:ir.ui.view,arch_db:google_recaptcha.res_config_settings_view_form
-msgid "<i class=\"fa fa-arrow-right\"/> Generate reCAPTCHA v3 keys"
+msgid "<i class=\"oi oi-arrow-right\"/> Generate reCAPTCHA v3 keys"
 msgstr ""
 
 #. module: google_recaptcha
@@ -43,11 +43,6 @@ msgid "HTTP Routing"
 msgstr "HTTP Routing"
 
 #. module: google_recaptcha
-#: model_terms:ir.ui.view,arch_db:google_recaptcha.res_config_settings_view_form
-msgid "If no keys are provided, no checks will be done."
-msgstr ""
-
-#. module: google_recaptcha
 #: model:ir.model.fields,field_description:google_recaptcha.field_res_config_settings__recaptcha_min_score
 msgid "Minimum score"
 msgstr "Хамгийн бага оноо"
@@ -55,21 +50,25 @@ msgstr "Хамгийн бага оноо"
 #. module: google_recaptcha
 #. odoo-javascript
 #: code:addons/google_recaptcha/static/src/js/recaptcha.js:0
-#, python-format
 msgid "No recaptcha site key set."
 msgstr ""
 
 #. module: google_recaptcha
 #. odoo-javascript
 #: code:addons/google_recaptcha/static/src/xml/recaptcha.xml:0
-#, python-format
 msgid "Privacy Policy"
+msgstr ""
+
+#. module: google_recaptcha
+#: model_terms:ir.ui.view,arch_db:google_recaptcha.res_config_settings_view_form
+msgid ""
+"Protect your forms from spam and abuse. If no keys are provided, no checks "
+"will be done."
 msgstr ""
 
 #. module: google_recaptcha
 #. odoo-javascript
 #: code:addons/google_recaptcha/static/src/xml/recaptcha.xml:0
-#, python-format
 msgid "Protected by reCAPTCHA,"
 msgstr ""
 
@@ -86,48 +85,41 @@ msgstr ""
 #. module: google_recaptcha
 #. odoo-javascript
 #: code:addons/google_recaptcha/static/src/xml/recaptcha.xml:0
-#, python-format
 msgid "Terms of Service"
 msgstr ""
 
 #. module: google_recaptcha
 #. odoo-python
 #: code:addons/google_recaptcha/models/ir_http.py:0
-#, python-format
 msgid "The reCaptcha private key is invalid."
 msgstr ""
 
 #. module: google_recaptcha
 #. odoo-python
 #: code:addons/google_recaptcha/models/ir_http.py:0
-#, python-format
 msgid "The reCaptcha token is invalid."
 msgstr ""
 
 #. module: google_recaptcha
 #. odoo-javascript
 #: code:addons/google_recaptcha/static/src/js/recaptcha.js:0
-#, python-format
 msgid "The recaptcha site key is invalid."
 msgstr ""
 
 #. module: google_recaptcha
 #. odoo-python
 #: code:addons/google_recaptcha/models/ir_http.py:0
-#, python-format
 msgid "The request is invalid or malformed."
 msgstr ""
 
 #. module: google_recaptcha
 #. odoo-python
 #: code:addons/google_recaptcha/models/ir_http.py:0
-#, python-format
 msgid "Your request has timed out, please retry."
 msgstr ""
 
 #. module: google_recaptcha
 #. odoo-javascript
 #: code:addons/google_recaptcha/static/src/xml/recaptcha.xml:0
-#, python-format
 msgid "apply."
 msgstr ""

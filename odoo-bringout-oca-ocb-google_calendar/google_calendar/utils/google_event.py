@@ -1,12 +1,13 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 import json
-
-from odoo.tools import email_normalize, ReadonlyDict
 import logging
-from typing import Iterator, Mapping
-from collections import abc
 import re
+from collections import abc
+from typing import Iterator, Mapping
+
+from odoo.tools import email_normalize
+from odoo.tools.misc import ReadonlyDict
 
 _logger = logging.getLogger(__name__)
 
@@ -196,9 +197,17 @@ class GoogleEvent(abc.Set):
         recurringEventId_value = re.match(r'(\w+_)', self.recurringEventId)
         if not id_value or not recurringEventId_value or id_value.group(1) != recurringEventId_value.group(1):
             return None
-        ID_RANGE = re.search(r'\w+_R\d+T\d+', self.recurringEventId).group()
-        TIMESTAMP = re.search(r'\d+T\d+Z', self.id).group()
-        return f"{ID_RANGE}_{TIMESTAMP}"
+        rec_pattern = re.search(r'(\w+_R\d+(?:T\d+)?(?:Z)?)', self.recurringEventId)
+        if not rec_pattern:
+            return None
+        id_range = rec_pattern.group()
+
+        ts_pattern = re.search(r'(\d{8}(?:T\d+Z?)?)$', self.id)
+        if not ts_pattern:
+            return None
+        timestamp = ts_pattern.group()
+
+        return f"{id_range}_{timestamp}"
 
     def cancelled(self):
         return self.filter(lambda e: e.status == 'cancelled')

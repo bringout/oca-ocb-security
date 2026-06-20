@@ -19,6 +19,14 @@
                                     <div class="d-flex align-items-center flex-wrap">
                                         <span class="d-md-none d-block">Or install an authenticator app</span>
                                         <span class="d-none d-md-block">Install an authenticator app on your mobile device</span>
+                                        <div class="d-block d-md-none">
+                                            <a href="https://play.google.com/store/search?q=authenticator&amp;c=apps" class="mx-2" target="blank">
+                                                <img alt="On Google Play" style="width: 24px;" src="/base_setup/static/src/img/logo_google_play.png"/>
+                                            </a>
+                                            <a href="http://appstore.com/2fa" class="mx-2" target="blank">
+                                                <img alt="On Apple Store" style="width: 24px;" src="/base_setup/static/src/img/logo_apple_store.png"/>
+                                            </a>
+                                        </div>
                                     </div>
                                 </li>
 
@@ -32,7 +40,7 @@
 
                             <!-- Desktop version -->
                             <div class="text-center d-none d-md-block">
-                                <field name="qrcode" readonly="True" widget="image" options="{'no_reload': true }" />
+                                <field name="qrcode" readonly="True" widget="image" options="{'reload': false }"/>
 
                                 <h3 class="fw-bold"><a data-bs-toggle="collapse"
                                    href="#collapseTotpSecret" role="button" aria-expanded="false"
@@ -60,7 +68,7 @@
                 <footer>
                     <button type="object" name="enable" class="btn btn-primary"
                             string="Activate" data-hotkey="q"/>
-                    <button string="Cancel" special="cancel" data-hotkey="z"/>
+                    <button string="Cancel" special="cancel" data-hotkey="x"/>
                 </footer>
             </form>
         </field>

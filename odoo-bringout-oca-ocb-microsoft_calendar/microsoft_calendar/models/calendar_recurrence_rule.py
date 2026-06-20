@@ -13,8 +13,6 @@ class RecurrenceRule(models.Model):
     # Don't sync by default. Sync only when the recurrence is applied
     need_sync_m = fields.Boolean(default=False)
 
-    microsoft_id = fields.Char('Microsoft Calendar Recurrence Id')
-
     def _compute_rrule(self):
         # Note: 'need_sync_m' is set to False to avoid syncing the updated recurrence with
         # Outlook, as this update may already come from Outlook. If not, this modification will
@@ -43,12 +41,13 @@ class RecurrenceRule(models.Model):
                 vals += [{
                     'name': event.name,
                     'microsoft_id': event.microsoft_id,
+                    'ms_universal_event_id': event.ms_universal_event_id,
                     'start': event.start,
                     'stop': event.stop,
                     'active': False,
                     'need_sync_m': True,
                 }]
-                event._microsoft_delete(event.user_id, event.ms_organizer_event_id)
+                event._microsoft_delete(event.user_id, event.microsoft_id)
                 event.ms_universal_event_id = False
         self.env['calendar.event'].create(vals)
         self.calendar_event_ids.need_sync_m = False
@@ -102,15 +101,23 @@ class RecurrenceRule(models.Model):
         super()._write_from_microsoft(microsoft_event, vals)
         new_event_values = self.env["calendar.event"]._microsoft_to_odoo_values(microsoft_event)
         # Edge case:  if the base event was deleted manually in 'self_only' update, skip applying recurrence.
-        if self._has_base_event_time_fields_changed(new_event_values) and (new_event_values['start'] >= self.base_event_id.start):
+        # Also skip when the base event is an exception (follow_recurrence=False), because its
+        # modified time will differ from the seriesMaster pattern without the master having changed,
+        # and entering the destructive path would clear all Microsoft IDs
+        if (
+            self._has_base_event_time_fields_changed(new_event_values) and
+            (new_event_values['start'] >= self.base_event_id.start) and
+            self.base_event_id.follow_recurrence
+        ):
             # we need to recreate the recurrence, time_fields were modified.
             base_event_id = self.base_event_id
             # We archive the old events to recompute the recurrence. These events are already deleted on Microsoft side.
             # We can't call _cancel because events without user_id would not be deleted
             (self.calendar_event_ids - base_event_id).microsoft_id = False
+            (self.calendar_event_ids - base_event_id).ms_universal_event_id = False
             (self.calendar_event_ids - base_event_id).unlink()
             base_event_id.with_context(dont_notify=True).write(dict(
-                new_event_values, microsoft_id=False, need_sync_m=False
+                new_event_values, microsoft_id=False, ms_universal_event_id=False, need_sync_m=False
             ))
             if self.rrule == current_rrule:
                 # if the rrule has changed, it will be recalculated below
@@ -132,7 +139,7 @@ class RecurrenceRule(models.Model):
         # to base_event start datetime.
         if self.rrule != current_rrule:
             detached_events = self._apply_recurrence()
-            detached_events.microsoft_id = False
+            detached_events.ms_universal_event_id = False
             detached_events.unlink()
 
     def _get_microsoft_sync_domain(self):
@@ -151,7 +158,7 @@ class RecurrenceRule(models.Model):
         if with_ids:
             recurrence = {
                 **recurrence,
-                'ms_organizer_event_id': microsoft_recurrence.id,
+                'microsoft_id': microsoft_recurrence.id,
                 'ms_universal_event_id': microsoft_recurrence.iCalUId,
             }
 
@@ -178,7 +185,7 @@ class RecurrenceRule(models.Model):
         if new_recurrence and new_recurrence.base_event_id.microsoft_id:
             new_recurrence.base_event_id._microsoft_delete(
                 new_recurrence.base_event_id._get_organizer(),
-                new_recurrence.base_event_id.ms_organizer_event_id
+                new_recurrence.base_event_id.microsoft_id
             )
 
         return new_recurrence
@@ -190,3 +197,9 @@ class RecurrenceRule(models.Model):
         if event:
             return event._get_event_user_m(user_id)
         return self.env.user
+
+    def _is_microsoft_insertion_blocked(self, sender_user):
+        self.ensure_one()
+        has_base_event = self.base_event_id
+        has_different_owner = self.base_event_id.user_id and self.base_event_id.user_id != sender_user
+        return has_base_event and has_different_owner

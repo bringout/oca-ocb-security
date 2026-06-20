@@ -2,6 +2,7 @@ from datetime import datetime
 from dateutil.relativedelta import relativedelta
 from pytz import UTC
 
+from odoo.exceptions import UserError
 from odoo.addons.microsoft_calendar.utils.microsoft_event import MicrosoftEvent
 from odoo.addons.microsoft_calendar.tests.common import TestCommon, patch_api
 
@@ -15,7 +16,7 @@ class TestMicrosoftEvent(TestCommon):
     def test_already_mapped_events(self):
 
         # arrange
-        event_id = self.simple_event.ms_organizer_event_id
+        event_id = self.simple_event.microsoft_id
         event_uid = self.simple_event.ms_universal_event_id
         events = MicrosoftEvent([{
             "type": "singleInstance",
@@ -31,10 +32,69 @@ class TestMicrosoftEvent(TestCommon):
         self.assertEqual(len(mapped._events), 1)
         self.assertEqual(mapped._events[event_id]["_odoo_id"], self.simple_event.id)
 
-    def test_map_an_event_using_global_id(self):
+    def test_forbid_edit_outlook_recurring_event(self):
+        """
+        Test that no user can edit a recurring event imported from Outlook
+        (identified by microsoft_recurrence_master_id), but that the sync
+        mechanism itself can still write through via dont_notify context.
+        """
+        # Give the organizer user a Microsoft token
+        self.organizer_user.microsoft_calendar_token = "fake_token"
 
+        outlook_recurring_event, recurring_event = self.env['calendar.event'].with_context(dont_notify=True).create([
+            {
+                'name': 'Outlook Recurring Event',
+                'start': datetime(2023, 9, 25, 10, 0),
+                'stop': datetime(2023, 9, 25, 11, 0),
+                'microsoft_id': 'AAA123:BBB456',
+                'microsoft_recurrence_master_id': 'MASTER123',
+                'user_id': self.organizer_user.id,
+            },
+            {
+                'name': 'Regular Recurring Event',
+                'start': datetime(2023, 9, 25, 10, 0),
+                'stop': datetime(2023, 9, 25, 11, 0),
+                'user_id': self.organizer_user.id,
+                'partner_ids': [(4, self.organizer_user.partner_id.id)],
+                'recurrency': True,
+                'follow_recurrence': True,
+                'rrule_type': 'daily',
+                'interval': 1,
+                'end_type': 'count',
+                'count': 3,
+            },
+        ])
+
+        # No user should be able to edit the Outlook event through Odoo
+        for user in [self.attendee_user, self.organizer_user]:
+            with self.assertRaises(UserError):
+                outlook_recurring_event.with_user(user).with_context(dont_notify=False).write({
+                    'name': 'Trying to change name',
+                    'recurrence_update': 'future_events',
+                })
+        self.assertEqual(outlook_recurring_event.name, 'Outlook Recurring Event')
+
+        # But changes from Microsoft sync itself should still work
+        outlook_recurring_event.with_context(dont_notify=True).write({
+            'name': 'Updated from Outlook',
+            'recurrence_update': 'future_events'
+        })
+        self.assertEqual(outlook_recurring_event.name, 'Updated from Outlook')
+
+        # Remove token: organizer is no longer synced to Outlook
+        self.organizer_user.microsoft_calendar_token = False
+
+        # Any user should be able to edit a non-Outlook recurring event
+        for user in [self.attendee_user, self.organizer_user]:
+            recurring_event.with_user(user).with_context(dont_notify=False).write({
+                'name': f'Changed by {user.name}',
+                'recurrence_update': 'future_events',
+            })
+            self.assertEqual(recurring_event.name, f'Changed by {user.name}')
+
+    def test_map_an_event_using_global_id(self):
         # arrange
-        event_id = self.simple_event.ms_organizer_event_id
+        event_id = self.simple_event.microsoft_id
         event_uid = self.simple_event.ms_universal_event_id
         events = MicrosoftEvent([{
             "type": "singleInstance",
@@ -55,7 +115,7 @@ class TestMicrosoftEvent(TestCommon):
         Here, the Odoo event has an uid but the Outlook event has not.
         """
         # arrange
-        event_id = self.simple_event.ms_organizer_event_id
+        event_id = self.simple_event.microsoft_id
         events = MicrosoftEvent([{
             "type": "singleInstance",
             "_odoo_id": False,
@@ -76,7 +136,7 @@ class TestMicrosoftEvent(TestCommon):
         """
 
         # arrange
-        event_id = self.simple_event.ms_organizer_event_id
+        event_id = self.simple_event.microsoft_id
         event_uid = self.simple_event.ms_universal_event_id
         self.simple_event.ms_universal_event_id = False
         events = MicrosoftEvent([{
@@ -100,7 +160,7 @@ class TestMicrosoftEvent(TestCommon):
         """
 
         # arrange
-        event_id = self.simple_event.ms_organizer_event_id
+        event_id = self.simple_event.microsoft_id
         self.simple_event.ms_universal_event_id = False
         events = MicrosoftEvent([{
             "type": "singleInstance",
@@ -120,7 +180,7 @@ class TestMicrosoftEvent(TestCommon):
     def test_map_a_recurrence_using_global_id(self):
 
         # arrange
-        rec_id = self.recurrence.ms_organizer_event_id
+        rec_id = self.recurrence.microsoft_id
         rec_uid = self.recurrence.ms_universal_event_id
         events = MicrosoftEvent([{
             "type": "seriesMaster",
@@ -139,7 +199,7 @@ class TestMicrosoftEvent(TestCommon):
     def test_map_a_recurrence_using_instance_id(self):
 
         # arrange
-        rec_id = self.recurrence.ms_organizer_event_id
+        rec_id = self.recurrence.microsoft_id
         events = MicrosoftEvent([{
             "type": "seriesMaster",
             "_odoo_id": False,
@@ -157,9 +217,9 @@ class TestMicrosoftEvent(TestCommon):
     def test_try_to_map_mixed_of_single_events_and_recurrences(self):
 
         # arrange
-        event_id = self.simple_event.ms_organizer_event_id
+        event_id = self.simple_event.microsoft_id
         event_uid = self.simple_event.ms_universal_event_id
-        rec_id = self.recurrence.ms_organizer_event_id
+        rec_id = self.recurrence.microsoft_id
         rec_uid = self.recurrence.ms_universal_event_id
 
         events = MicrosoftEvent([
@@ -184,7 +244,7 @@ class TestMicrosoftEvent(TestCommon):
     def test_match_event_only(self):
 
         # arrange
-        event_id = self.simple_event.ms_organizer_event_id
+        event_id = self.simple_event.microsoft_id
         event_uid = self.simple_event.ms_universal_event_id
         events = MicrosoftEvent([{
             "type": "singleInstance",
@@ -203,7 +263,7 @@ class TestMicrosoftEvent(TestCommon):
     def test_match_recurrence_only(self):
 
         # arrange
-        rec_id = self.recurrence.ms_organizer_event_id
+        rec_id = self.recurrence.microsoft_id
         rec_uid = self.recurrence.ms_universal_event_id
         events = MicrosoftEvent([{
             "type": "seriesMaster",
@@ -226,7 +286,7 @@ class TestMicrosoftEvent(TestCommon):
         recurrence.
         """
         # arrange
-        rec_id = self.recurrence.ms_organizer_event_id
+        rec_id = self.recurrence.microsoft_id
         rec_uid = self.recurrence.ms_universal_event_id
         events = MicrosoftEvent([{
             "@removed": {
@@ -247,9 +307,9 @@ class TestMicrosoftEvent(TestCommon):
     def test_match_mix_of_events_and_recurrences(self):
 
         # arrange
-        event_id = self.simple_event.ms_organizer_event_id
+        event_id = self.simple_event.microsoft_id
         event_uid = self.simple_event.ms_universal_event_id
-        rec_id = self.recurrence.ms_organizer_event_id
+        rec_id = self.recurrence.microsoft_id
         rec_uid = self.recurrence.ms_universal_event_id
 
         events = MicrosoftEvent([
@@ -296,11 +356,10 @@ class TestMicrosoftEvent(TestCommon):
     def test_search_set_ms_universal_event_id(self):
         not_synced_events = self.env['calendar.event'].search([('ms_universal_event_id', '=', False)])
         synced_events = self.env['calendar.event'].search([('ms_universal_event_id', '!=', False)])
-
         self.assertIn(self.simple_event, synced_events)
         self.assertNotIn(self.simple_event, not_synced_events)
 
-        self.simple_event.ms_universal_event_id = ''
+        self.simple_event.ms_universal_event_id = False
         not_synced_events = self.env['calendar.event'].search([('ms_universal_event_id', '=', False)])
         synced_events = self.env['calendar.event'].search([('ms_universal_event_id', '!=', False)])
 

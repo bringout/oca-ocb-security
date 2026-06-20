@@ -17,36 +17,15 @@ pip install odoo-bringout-oca-ocb-auth_totp_mail_enforce
 
 ## Dependencies
 
-This addon depends on:
 - auth_totp
 - mail
 
-## Manifest Information
-
-- **Name**: 2FA by mail
-- **Version**: N/A
-- **Category**: Extra Tools
-- **License**: LGPL-3
-- **Installable**: False
-
 ## Source
 
-Based on [OCA/OCB](https://github.com/OCA/OCB) branch 16.0, addon `auth_totp_mail_enforce`.
+- Repository: https://github.com/OCA/OCB
+- Branch: 18.0
+- Path: addons/auth_totp_mail_enforce
 
 ## License
 
-This package maintains the original LGPL-3 license from the upstream Odoo project.
-
-## Documentation
-
-- Overview: doc/OVERVIEW.md
-- Architecture: doc/ARCHITECTURE.md
-- Models: doc/MODELS.md
-- Controllers: doc/CONTROLLERS.md
-- Wizards: doc/WIZARDS.md
-- Install: doc/INSTALL.md
-- Usage: doc/USAGE.md
-- Configuration: doc/CONFIGURATION.md
-- Dependencies: doc/DEPENDENCIES.md
-- Troubleshooting: doc/TROUBLESHOOTING.md
-- FAQ: doc/FAQ.md
+This package preserves the original LGPL-3 license.

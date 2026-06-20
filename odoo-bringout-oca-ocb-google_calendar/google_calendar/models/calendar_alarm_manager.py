@@ -1,6 +1,7 @@
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
 
 from odoo import api, models
+from odoo.tools import SQL
 
 
 class AlarmManager(models.AbstractModel):
@@ -8,5 +9,7 @@ class AlarmManager(models.AbstractModel):
 
     @api.model
     def _get_notify_alert_extra_conditions(self):
-        res = super()._get_notify_alert_extra_conditions()
-        return f'{res} AND "event"."google_id" IS NULL'
+        base = super()._get_notify_alert_extra_conditions()
+        if self.env.context.get('alarm_type') == 'email':
+            return SQL("%s AND event.google_id IS NULL", base)
+        return base
